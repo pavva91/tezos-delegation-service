@@ -1,0 +1,18 @@
+# Database credentials
+database:
+  connections: 10
+  db-name: "<your-db-name>"
+  host: "localhost"
+  pass: "<your-db-pass>"
+  port: 5432
+  user: "postgres"
+
+# Server configurations
+server:
+  api-path: "api"
+  api-version: "v1"
+  cors-allowed-clients: ["http://localhost:5173"]
+  environment: "dev"
+  host: "localhost"
+  port: 8080
+  protocol: "http"
