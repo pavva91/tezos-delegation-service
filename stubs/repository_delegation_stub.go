@@ -1,6 +1,6 @@
 package stubs
 
-import "github.com/pavva91/gin-gorm-rest/models"
+import "github.com/pavva91/tezos-delegation-service/models"
 
 type DelegationRepositoryStub struct {
 	ListDelegationsFn func() ([]models.Delegation, error)

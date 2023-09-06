@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/gin-gorm-rest/services"
+	"github.com/pavva91/tezos-delegation-service/services"
 )
 
 var (

@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/pavva91/gin-gorm-rest/config"
+	"github.com/pavva91/tezos-delegation-service/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

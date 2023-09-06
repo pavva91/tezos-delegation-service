@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/pavva91/gin-gorm-rest/controllers"
+	"github.com/pavva91/tezos-delegation-service/controllers"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

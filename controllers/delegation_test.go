@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/gin-gorm-rest/models"
-	"github.com/pavva91/gin-gorm-rest/services"
-	"github.com/pavva91/gin-gorm-rest/stubs"
+	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/services"
+	"github.com/pavva91/tezos-delegation-service/stubs"
 	"github.com/stretchr/testify/assert"
 )
 

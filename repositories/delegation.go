@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/pavva91/gin-gorm-rest/db"
-	"github.com/pavva91/gin-gorm-rest/models"
+	"github.com/pavva91/tezos-delegation-service/db"
+	"github.com/pavva91/tezos-delegation-service/models"
 )
 
 var (

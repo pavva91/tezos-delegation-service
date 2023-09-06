@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/pavva91/gin-gorm-rest/config"
+	"github.com/pavva91/tezos-delegation-service/config"
 	"gorm.io/gorm"
 )
 

@@ -1,16 +1,16 @@
 package main
 
 import (
-	// docs "github.com/pavva91/gin-gorm-rest/docs"
+	// docs "github.com/pavva91/tezos-delegation-service/docs"
 
 	"os"
 	"strconv"
 
-	"github.com/pavva91/gin-gorm-rest/server"
+	"github.com/pavva91/tezos-delegation-service/server"
 	"github.com/rs/zerolog/log"
 )
 
-// import "github.com/pavva91/gin-gorm-rest/routes"
+// import "github.com/pavva91/tezos-delegation-service/routes"
 
 //	@termsOfService	http://swagger.io/terms/
 

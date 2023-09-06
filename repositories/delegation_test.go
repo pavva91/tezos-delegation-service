@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/pavva91/gin-gorm-rest/db"
-	"github.com/pavva91/gin-gorm-rest/mocks"
-	"github.com/pavva91/gin-gorm-rest/models"
+	"github.com/pavva91/tezos-delegation-service/db"
+	"github.com/pavva91/tezos-delegation-service/mocks"
+	"github.com/pavva91/tezos-delegation-service/models"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

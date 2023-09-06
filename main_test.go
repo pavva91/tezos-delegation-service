@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/pavva91/gin-gorm-rest/config"
-	"github.com/pavva91/gin-gorm-rest/server"
+	"github.com/pavva91/tezos-delegation-service/config"
+	"github.com/pavva91/tezos-delegation-service/server"
 	"github.com/stretchr/testify/assert"
 )
 

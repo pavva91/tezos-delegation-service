@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/gin-gorm-rest/config"
+	"github.com/pavva91/tezos-delegation-service/config"
 	"github.com/rs/zerolog/log"
 )
 
