@@ -10,7 +10,7 @@ func mapUrls(apiVersion string) {
 	api := router.Group(apiVersion)
 	{
 
-		api.POST("/delegations", controllers.DelegationController.ListDelegations)
+		api.GET("/xtz/delegations", controllers.DelegationController.ListDelegations)
 
 		healthGroup := api.Group("health")
 		{
