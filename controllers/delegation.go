@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pavva91/tezos-delegation-service/dto"
 	"github.com/pavva91/tezos-delegation-service/services"
 )
 
@@ -30,7 +31,9 @@ func (controller eventController) ListDelegations(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	context.JSON(http.StatusOK, &delegations)
+	// TODO: Add "data" into the response
+	delegationResponses := new(dto.DelegationResponse).ToDtos(delegations)
+	context.JSON(http.StatusOK, &delegationResponses)
 	context.Abort()
 	return
 }
