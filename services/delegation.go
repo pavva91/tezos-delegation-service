@@ -27,7 +27,7 @@ type DelegationServiceInterface interface {
 type delegationServiceImpl struct{}
 
 func (service delegationServiceImpl) ListAllDelegations() ([]models.Delegation, error) {
-	return repositories.DelegationRepository.ListDelegations()
+	return repositories.DelegationRepository.List()
 }
 
 func (service delegationServiceImpl) PollDelegations(freqInSeconds int) error {

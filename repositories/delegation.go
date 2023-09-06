@@ -10,12 +10,13 @@ var (
 )
 
 type DelegationRepositoryInterface interface {
-	ListDelegations() ([]models.Delegation, error)
+	List() ([]models.Delegation, error)
+	Create(delegation *models.Delegation) (*models.Delegation, error)
 }
 
 type delegationRepositoryImpl struct{}
 
-func (repository delegationRepositoryImpl) ListDelegations() ([]models.Delegation, error) {
+func (repository delegationRepositoryImpl) List() ([]models.Delegation, error) {
 	delegations := []models.Delegation{}
 	err := db.DbOrm.GetDB().Find(&delegations).Error
 	if err != nil {
@@ -23,3 +24,12 @@ func (repository delegationRepositoryImpl) ListDelegations() ([]models.Delegatio
 	}
 	return delegations, nil
 }
+
+func (repository delegationRepositoryImpl) Create(delegation *models.Delegation) (*models.Delegation, error) {
+	err := db.DbOrm.GetDB().Create(&delegation).Error
+	if err != nil {
+		return nil, err
+	}
+	return delegation, nil
+}
+
