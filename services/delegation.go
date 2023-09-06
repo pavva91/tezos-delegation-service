@@ -67,8 +67,16 @@ func (service delegationServiceImpl) PollDelegations(freqInSeconds int) error {
 		if len(result) != 0 {
 			// TODO: Add records to DB
 			// TODO: From DTO to Model
-			// TODO: Check if is a replicate before adding to DB
-			fmt.Println(result[0].Hash)
+			for _, r := range result {
+				delegationModel := r.ToModel()
+				// TODO: Check if is a replicate before adding to DB
+				createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
+				if err != nil {
+					log.Info().Err(err).Msg("Error Creating Delegation in DB")
+					return err
+				}
+				log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(createdDelegation.ID)))
+			}
 		}
 
 		fmt.Println(string(responseBody))
