@@ -3,16 +3,16 @@ package server
 import (
 	"fmt"
 
+	"github.com/pavva91/tezos-delegation-service/config"
+	"github.com/pavva91/tezos-delegation-service/db"
+	"github.com/pavva91/tezos-delegation-service/docs"
+	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/services"
 	"github.com/rs/zerolog/log"
 
 	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/pavva91/gin-gorm-rest/config"
-	"github.com/pavva91/gin-gorm-rest/db"
-	"github.com/pavva91/gin-gorm-rest/docs"
-	"github.com/pavva91/gin-gorm-rest/models"
-	"github.com/pavva91/gin-gorm-rest/services"
 )
 
 func StartApplication() {
@@ -55,7 +55,7 @@ func StartApplication() {
 
 	inititalizeDb()
 
-	go services.DelegationService.PollDelegations()
+	go services.DelegationService.PollDelegations(10)
 
 	// Create Router
 	router := NewRouter()
@@ -68,5 +68,5 @@ func StartApplication() {
 }
 
 func inititalizeDb() {
-	
+
 }
