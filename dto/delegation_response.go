@@ -20,7 +20,7 @@ func (dto *DelegationResponse) ToDto(delegation models.Delegation) {
 	dto.Block = delegation.Block
 }
 
-func (dto DelegationResponse) ToDtos(delegationModels []models.Delegation) (delegationDtos []DelegationResponse) {
+func (dto *DelegationResponse) ToDtos(delegationModels []models.Delegation) (delegationDtos []DelegationResponse) {
 	delegationDtos = make([]DelegationResponse, len(delegationModels))
 	for i, delegationModel := range delegationModels {
 		delegationDtos[i].ToDto(delegationModel)
