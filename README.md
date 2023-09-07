@@ -70,6 +70,12 @@ Try the running application directly on the Swagger API:
 
 - `http://localhost:8080/swagger/index.html#/`
 
+### Run All Tests
+
+Run all tests and open results on browser:
+
+- `go test ./... -coverprofile coverage.out && go tool cover -html=coverage.out`
+
 ## Run Environments
 
 Setup 3 environments: dev, stage and prod
