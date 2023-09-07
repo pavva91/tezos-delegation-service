@@ -56,7 +56,12 @@ There are 2 config files:
 #### Go Build and run binary
 
 1. `cd <project_root>`
-2. `go build -o bin/app-amd64-linux ./main.go`
+2. ` go build -o bin/app-amd64-linux main.go`
+
+- Explicit Builds:
+  - `GOOS=linux GOARCH=amd64 go build -o bin/app-amd64-linux main.go`
+  - `GOOS=darwin GOARCH=amd64 go build -o bin/app-amd64-darwin main.go`
+
 3. `SERVER_ENVIRONMENT="dev" bin/app-amd64-linux`
 
 ## Run Environments
@@ -232,11 +237,11 @@ cover () {
 
 DB Management inside neovim through dadbod ([tpope/vim-dadbod](https://github.com/tpope/vim-dadbod), [kristijanhusak/vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui), [kristijanhusak/vim-dadbod-completion](https://github.com/kristijanhusak/vim-dadbod-completion)):
 
-1. `:DBUI` (\<leader\>db is :DBUIToggle)
+1. `:DBUI` (\<leader\>db is `:DBUIToggle`)
 2. Connection to db (Add connection):
-   - postgres://\<user\>:\<password\>@localhost:\<port\>/\<db_name\>
+   - `postgres://\<user\>:\<password\>@localhost:\<port\>/\<db_name\>`
 3. In case of default values (dev db)
-   - postgres://postgres:localhost@localhost:5432/postgres
+   - `postgres://postgres:localhost@localhost:5432/postgres`
 
 ### PostgreSQL Database
 
