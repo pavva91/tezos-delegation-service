@@ -5,7 +5,8 @@ var ServerConfigValues ServerConfig
 // Model that links to config.yml file
 type ServerConfig struct {
 	ApiDelegations struct {
-		Endpoint string `yaml:"endpoint"`
+		Endpoint            string `yaml:"endpoint"`
+		PollPeriodInSeconds int    `yaml:"poll-period-in-seconds"`
 	} `yaml:"api-delegations"`
 	Database struct {
 		Connections int    `yaml:"connections" env:"DB_CONNECTIONS" env-description:"Total number of database connections"`

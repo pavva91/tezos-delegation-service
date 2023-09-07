@@ -1,3 +1,7 @@
+api-delegations:
+  endpoint: "<api-delegations-endpoint"
+  poll-period-in-seconds: 5
+
 # Database credentials
 database:
   connections: 10

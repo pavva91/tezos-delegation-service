@@ -55,7 +55,7 @@ func StartApplication() {
 
 	inititalizeDb()
 
-	go services.DelegationService.PollDelegations(10)
+	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint)
 
 	// Create Router
 	router := NewRouter()
