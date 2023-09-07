@@ -53,7 +53,7 @@ There are 2 config files:
 
 #### Run Go REST API Service (terminal 3)
 
-#### Go Build and run binary
+##### Go Build and run binary
 
 1. `cd <project_root>`
 2. ` go build -o bin/app-amd64-linux main.go`
@@ -63,6 +63,11 @@ There are 2 config files:
   - `GOOS=darwin GOARCH=amd64 go build -o bin/app-amd64-darwin main.go`
 
 3. `SERVER_ENVIRONMENT="dev" bin/app-amd64-linux`
+
+### Try the running application
+Try the running application directly on the Swagger API:
+
+- `http://localhost:8080/swagger/index.html#/`
 
 ## Run Environments
 
