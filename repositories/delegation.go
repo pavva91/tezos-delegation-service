@@ -18,7 +18,7 @@ type delegationRepositoryImpl struct{}
 
 func (repository delegationRepositoryImpl) List() ([]models.Delegation, error) {
 	delegations := []models.Delegation{}
-	err := db.DbOrm.GetDB().Find(&delegations).Error
+	err := db.DbOrm.GetDB().Order("timestamp DESC").Find(&delegations).Error
 	if err != nil {
 		return nil, err
 	}
