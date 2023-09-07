@@ -27,3 +27,7 @@ func (dto *DelegationResponse) ToDtos(delegationModels []models.Delegation) (del
 	}
 	return delegationDtos
 }
+
+type DataDelegationSliceResponse struct {
+	Data []DelegationResponse `json:"data"`
+}
