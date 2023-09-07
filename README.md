@@ -45,26 +45,27 @@ There are 2 config files:
 1. For DB: `docker/dev/.env` (copy from: `docker/dev/example.env`)
 2. For Go Application: `config/dev-config.yml` (copy from `config/dev-config.yml`)
 
-#### Run PostgreSQL Database (docker)
+#### Run PostgreSQL Database (terminal 1 - docker)
 
 1. `cd <project_root>`
 2. `cd docker/dev`
 3. `docker compose up`
 
-#### Run Go REST API Service (terminal 3)
+#### Run Go REST API Service (terminal 2 - binary)
 
 ##### Go Build and run binary
 
 1. `cd <project_root>`
-2. ` go build -o bin/app-amd64-linux main.go`
+2. Build: ` go build -o bin/app-amd64-linux main.go`
 
 - Explicit Builds:
   - `GOOS=linux GOARCH=amd64 go build -o bin/app-amd64-linux main.go`
   - `GOOS=darwin GOARCH=amd64 go build -o bin/app-amd64-darwin main.go`
 
-3. `SERVER_ENVIRONMENT="dev" bin/app-amd64-linux`
+3. Run binary: `SERVER_ENVIRONMENT="dev" bin/app-amd64-linux`
 
 ### Try the running application
+
 Try the running application directly on the Swagger API:
 
 - `http://localhost:8080/swagger/index.html#/`
