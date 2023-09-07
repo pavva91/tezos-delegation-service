@@ -24,7 +24,7 @@ type eventController struct{}
 //	@Tags			delegations
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{array}	dto.DelegationResponse
+//	@Success		200	{array}		dto.DelegationResponse
 //	@Failure		500	{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
 func (controller eventController) ListDelegations(context *gin.Context) {
