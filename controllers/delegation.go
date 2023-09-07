@@ -53,5 +53,5 @@ func (controller eventController) ListDelegations(context *gin.Context) {
 }
 
 type ListDelegationsQueryParameters struct {
-	Year time.Time `form:"year" time_format:"2006" time_utc:"0"`
+	Year time.Time `form:"year" time_format:"2006"`
 }
