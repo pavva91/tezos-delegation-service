@@ -73,10 +73,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.DelegationResponse"
-                            }
+                            "$ref": "#/definitions/dto.DataDelegationSliceResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errorhandling.SimpleErrorMessage"
                         }
                     },
                     "500": {
@@ -90,6 +93,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.DataDelegationSliceResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DelegationResponse"
+                    }
+                }
+            }
+        },
         "dto.DelegationResponse": {
             "type": "object",
             "properties": {

@@ -25,7 +25,8 @@ type delegationController struct{}
 //	@Accept			json
 //	@Produce		json
 //	@Param			year	query		string	false	"Filter results by year"
-//	@Success		200		{array}		dto.DelegationResponse
+//	@Success		200		{object}	dto.DataDelegationSliceResponse
+//	@Failure		400		{object}	errorhandling.SimpleErrorMessage
 //	@Failure		500		{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
 func (controller delegationController) ListDelegations(context *gin.Context) {

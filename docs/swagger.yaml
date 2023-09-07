@@ -1,4 +1,11 @@
 definitions:
+  dto.DataDelegationSliceResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.DelegationResponse'
+        type: array
+    type: object
   dto.DelegationResponse:
     properties:
       amount:
@@ -59,9 +66,11 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/dto.DelegationResponse'
-            type: array
+            $ref: '#/definitions/dto.DataDelegationSliceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandling.SimpleErrorMessage'
         "500":
           description: Internal Server Error
           schema:
