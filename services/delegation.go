@@ -50,7 +50,6 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 		savedDelegations = append(savedDelegations, *delegationModel)
 		log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(createdDelegation.ID)))
 	}
-	// TODO: Unlock RWMutex on Write
 	return savedDelegations, nil
 }
 
@@ -60,7 +59,6 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 
 	for {
 		newTime := time.Now().UTC()
-		log.Info().Msg(newTime.Format(time.RFC3339))
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := http.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
