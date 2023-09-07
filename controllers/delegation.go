@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pavva91/tezos-delegation-service/dto"
@@ -27,7 +28,16 @@ type eventController struct{}
 //	@Failure		500	{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
 func (controller eventController) ListDelegations(context *gin.Context) {
-	delegations, err := services.DelegationService.ListAllDelegations()
+	var queryParameters ListDelegationsQueryParameters
+	err := context.ShouldBind(&queryParameters)
+	if err != nil {
+		log.Error().Err(err).Msg("Unable to Parse Query Parameters")
+		errorMessage := errorhandling.SimpleErrorMessage{Message: err.Error()}
+		context.JSON(http.StatusBadRequest, errorMessage)
+		context.Abort()
+		return
+	}
+	delegations, err := services.DelegationService.ListDelegations(queryParameters.Year)
 	if err != nil {
 		log.Err(err).Msg("Error listing delegations")
 		errorMessage := errorhandling.SimpleErrorMessage{Message: "Error to list delegations"}
@@ -40,4 +50,8 @@ func (controller eventController) ListDelegations(context *gin.Context) {
 	context.JSON(http.StatusOK, &delegationResponses)
 	context.Abort()
 	return
+}
+
+type ListDelegationsQueryParameters struct {
+	Year time.Time `form:"year" time_format:"2006" time_utc:"0"`
 }

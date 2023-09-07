@@ -20,14 +20,18 @@ var (
 )
 
 type DelegationServiceInterface interface {
-	ListDelegations() ([]models.Delegation, error)
+	ListDelegations(year time.Time) ([]models.Delegation, error)
 	PollDelegations(int, string) error
 }
 
 type delegationServiceImpl struct{}
 
-func (service delegationServiceImpl) ListDelegations() ([]models.Delegation, error) {
-	return repositories.DelegationRepository.List()
+func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.Delegation, error) {
+	if year.IsZero() {
+		return repositories.DelegationRepository.List()
+	} else {
+		return repositories.DelegationRepository.ListByYear(year)
+	}
 }
 
 func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
