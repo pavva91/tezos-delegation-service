@@ -1,4 +1,4 @@
-# Tezos Delegation Service
+# Tezos Delegation Service - Mid Backend Exercise
 
 Build a service that gathers new delegations made on the Tezos protocol and exposes them through a public API.
 
