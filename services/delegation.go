@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/pavva91/tezos-delegation-service/dto"
@@ -21,7 +22,7 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(int, string) error
+	PollDelegations(int, string, *sync.RWMutex) error
 }
 
 type delegationServiceImpl struct{}
@@ -34,17 +35,18 @@ func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.D
 	}
 }
 
-func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
+func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync.RWMutex) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
-	// TODO: Lock RWMutex on Write
 	for _, r := range delegations {
 		delegationModel := r.ToModel()
 		// TODO: Check if is a replicate before adding to DB
+		rwmu.Lock()
 		createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
 		if err != nil {
 			log.Info().Err(err).Msg("Error Creating Delegation in DB")
 			return nil, err
 		}
+		rwmu.Unlock()
 		savedDelegations = append(savedDelegations, *delegationModel)
 		log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(createdDelegation.ID)))
 	}
@@ -52,7 +54,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex) error {
 
 	oldTime := time.Now().UTC()
 
@@ -85,7 +87,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 			return err
 		}
 
-		savedDelegations, err := SaveBulkDelegations(results)
+		savedDelegations, err := SaveBulkDelegations(results, rwmu)
 		if err != nil {
 			return err
 		}

@@ -45,7 +45,6 @@ func (controller eventController) ListDelegations(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	// TODO: Add "data" into the response
 	delegationResponses := new(dto.DelegationResponse).ToDtos(delegations)
 	response := dto.DataDelegationSliceResponse{
 		Data: delegationResponses,

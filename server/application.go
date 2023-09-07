@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/pavva91/tezos-delegation-service/config"
 	"github.com/pavva91/tezos-delegation-service/db"
@@ -55,7 +56,8 @@ func StartApplication() {
 
 	inititalizeDb()
 
-	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint)
+	rwMutex := &sync.RWMutex{}
+	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex)
 
 	// Create Router
 	router := NewRouter()
