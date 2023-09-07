@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	DelegationController = eventController{}
+	DelegationController = delegationController{}
 )
 
-type eventController struct{}
+type delegationController struct{}
 
 // ListDelegations godoc
 //
@@ -27,7 +27,7 @@ type eventController struct{}
 //	@Success		200	{array}		dto.DelegationResponse
 //	@Failure		500	{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
-func (controller eventController) ListDelegations(context *gin.Context) {
+func (controller delegationController) ListDelegations(context *gin.Context) {
 	var queryParameters ListDelegationsQueryParameters
 	err := context.ShouldBind(&queryParameters)
 	if err != nil {
