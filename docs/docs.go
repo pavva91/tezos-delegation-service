@@ -61,6 +61,14 @@ const docTemplate = `{
                     "delegations"
                 ],
                 "summary": "List Delegations",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter results by year",
+                        "name": "year",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

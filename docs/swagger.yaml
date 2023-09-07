@@ -48,6 +48,11 @@ paths:
       consumes:
       - application/json
       description: List all the aggregated new delegations
+      parameters:
+      - description: Filter results by year
+        in: query
+        name: year
+        type: string
       produces:
       - application/json
       responses:
