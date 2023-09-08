@@ -59,9 +59,9 @@ func StartApplication() {
 	rwMutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
-	interruptCh := make(chan struct{})
+	interruptSignalCh := make(chan struct{})
 
-	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex, stopOnError, errorCh, interruptCh)
+	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex, stopOnError, errorCh, interruptSignalCh)
 
 	// Create Router
 	router := NewRouter()

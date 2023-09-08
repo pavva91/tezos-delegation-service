@@ -53,7 +53,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, interruptCh <-chan struct{}) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, interruptSignalCh <-chan struct{}) error {
 
 	oldTime := time.Now().UTC()
 	client := http.Client{
@@ -62,7 +62,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 
 	for {
 		select {
-		case <-interruptCh:
+		case <-interruptSignalCh:
 			quitOnError = true
 		default:
 			// log.Info().Msg("Continue polling")
