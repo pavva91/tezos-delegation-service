@@ -56,6 +56,9 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, interruptCh <-chan struct{}) error {
 
 	oldTime := time.Now().UTC()
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
 
 	for {
 		select {
@@ -66,9 +69,6 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		}
 		newTime := time.Now().UTC()
 
-		client := http.Client{
-			Timeout: 5 * time.Second,
-		}
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
