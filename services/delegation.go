@@ -22,7 +22,7 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(int, string, *sync.RWMutex, <-chan bool, chan<- error) error
+	PollDelegations(int, string, *sync.RWMutex, bool, chan<- error, <-chan struct{}) error
 }
 
 type delegationServiceImpl struct{}
@@ -53,11 +53,17 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quit <-chan bool, errorCh chan<- error) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, interruptCh <-chan struct{}) error {
 
 	oldTime := time.Now().UTC()
 
 	for {
+		select {
+		case <-interruptCh:
+			quitOnError = true
+		default:
+			// log.Info().Msg("Continue polling")
+		}
 		newTime := time.Now().UTC()
 
 		client := http.Client{
@@ -66,30 +72,22 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
-			// NOTE: Not showing this log correctly, there's a delay
-			// Last Good (time when connectivity breaks): 2023-09-08T13:11:20+02:00
-			// First Time prints error log: 2023-09-08T13:27:48+02:00
 			log.Info().Err(err).Msg("Connectivity Error - No response from request")
-			// NOTE: After first cycle with error stops here to wait for channel
-			select {
-			case <-quit:
+			if quitOnError {
 				errorCh <- err
 				return err
-			default:
+			} else {
 				time.Sleep(time.Duration(periodInSeconds) * time.Second)
 				continue
 			}
 		}
 		if response.StatusCode != http.StatusOK {
-			// NOTE: Not showing this log, probably same problem
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
 			log.Info().Err(err).Msg("")
-			// NOTE: After first cycle with error stops here to wait for channel
-			select {
-			case <-quit:
+			if quitOnError {
 				errorCh <- err
 				return err
-			default:
+			} else {
 				time.Sleep(time.Duration(periodInSeconds) * time.Second)
 				continue
 			}
