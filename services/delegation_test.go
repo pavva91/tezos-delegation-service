@@ -92,8 +92,15 @@ func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "unsupported protocol scheme"
 	rwmutex := &sync.RWMutex{}
+	stopOnError := make(chan bool)
+	errorCh := make(chan error)
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex, stopOnError, errorCh)
+
+	time.Sleep(3 * time.Second)
+	stopOnError <- true
+	err := <-errorCh
+	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), expectedErrorContent1)
@@ -106,8 +113,14 @@ func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "dial tcp: lookup wrong: no such host"
 	rwmutex := &sync.RWMutex{}
+	stopOnError := make(chan bool)
+	errorCh := make(chan error)
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex, stopOnError, errorCh)
+
+	time.Sleep(3 * time.Second)
+	stopOnError <- true
+	err := <-errorCh
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -120,6 +133,8 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 	errorHttpStatus := http.StatusBadRequest
 	expectedError := "Get Response different than 200: " + strconv.Itoa(errorHttpStatus)
 	rwmutex := &sync.RWMutex{}
+	stopOnError := make(chan bool)
+	errorCh := make(chan error)
 
 	// Mock outbound http request https://medium.com/zus-health/mocking-outbound-http-requests-in-go-youre-probably-doing-it-wrong-60373a38d2aa
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +146,11 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 	}))
 	defer server.Close()
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh)
+
+	time.Sleep(3 * time.Second)
+	stopOnError <- true
+	err := <-errorCh
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -152,8 +171,10 @@ func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
 		w.Write(unexpectedJSON)
 	}))
 	defer server.Close()
+	stopOnError := make(chan bool)
+	errorCh := make(chan error)
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex)
+	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh)
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -170,6 +191,8 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 	// NOTE: error: "Get \"http://127.0.0.1:45969/operations/delegations?timestamp.ge=2023-09-07T08:49:59Z&timestamp.lt=2023-09-07T08:50:01Z\": dial tcp 127.0.0.1:45969: connect: connection refused"
 	expectedErrorContent1 := "connect: connection refused"
 	rwmutex := &sync.RWMutex{}
+	stopOnError := make(chan bool)
+	errorCh := make(chan error)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/operations/delegations" {
@@ -186,7 +209,11 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 
 	defer server.Close()
 
-	err = DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh)
+
+	time.Sleep(5 * time.Second)
+	stopOnError <- true
+	err = <-errorCh
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)

@@ -22,7 +22,7 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(int, string, *sync.RWMutex) error
+	PollDelegations(int, string, *sync.RWMutex, chan bool, chan error) error
 }
 
 type delegationServiceImpl struct{}
@@ -53,7 +53,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quit chan bool, errorCh chan error) error {
 
 	oldTime := time.Now().UTC()
 
@@ -63,12 +63,25 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		response, err := http.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
 			log.Error().Err(err).Msg("No response from request")
-			return err
+			// TODO: Should not stop polling
+			// return err
+			time.Sleep(time.Duration(periodInSeconds) * time.Second)
+			if <-quit {
+				errorCh <- err
+				return err
+			}
+			continue
 		}
 		if response.StatusCode != http.StatusOK {
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
 			log.Error().Err(err).Msg("")
-			return err
+			// return err
+			time.Sleep(time.Duration(periodInSeconds) * time.Second)
+			if <-quit {
+				errorCh <- err
+				return err
+			}
+			continue
 		}
 
 		defer response.Body.Close()
