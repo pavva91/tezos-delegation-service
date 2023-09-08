@@ -59,8 +59,12 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 
 	for {
 		newTime := time.Now().UTC()
+
+		client := http.Client{
+			Timeout: 5 * time.Second,
+		}
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
-		response, err := http.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
+		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
 			// NOTE: Not showing this log correctly, there's a delay
 			// Last Good (time when connectivity breaks): 2023-09-08T13:11:20+02:00
