@@ -63,8 +63,6 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		response, err := http.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
 			log.Error().Err(err).Msg("No response from request")
-			// TODO: Should not stop polling
-			// return err
 			time.Sleep(time.Duration(periodInSeconds) * time.Second)
 			if <-quit {
 				errorCh <- err
@@ -75,7 +73,6 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		if response.StatusCode != http.StatusOK {
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
 			log.Error().Err(err).Msg("")
-			// return err
 			time.Sleep(time.Duration(periodInSeconds) * time.Second)
 			if <-quit {
 				errorCh <- err
