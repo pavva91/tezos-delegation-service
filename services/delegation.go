@@ -22,7 +22,7 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(int, string, *sync.RWMutex, chan bool, chan error) error
+	PollDelegations(int, string, *sync.RWMutex, <-chan bool, chan<- error) error
 }
 
 type delegationServiceImpl struct{}
@@ -53,7 +53,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quit chan bool, errorCh chan error) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quit <-chan bool, errorCh chan<- error) error {
 
 	oldTime := time.Now().UTC()
 
@@ -62,23 +62,31 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := http.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
-			log.Error().Err(err).Msg("No response from request")
-			time.Sleep(time.Duration(periodInSeconds) * time.Second)
-			if <-quit {
+			// NOTE: Not showing this log
+			log.Info().Err(err).Msg("Connectivity Error - No response from request")
+			// NOTE: After first cycle with error stops here to wait for channel
+			select {
+			case <-quit:
 				errorCh <- err
 				return err
+			default:
+				time.Sleep(time.Duration(periodInSeconds) * time.Second)
+				continue
 			}
-			continue
 		}
 		if response.StatusCode != http.StatusOK {
+			// NOTE: Not showing this log
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
-			log.Error().Err(err).Msg("")
-			time.Sleep(time.Duration(periodInSeconds) * time.Second)
-			if <-quit {
+			log.Info().Err(err).Msg("")
+			// NOTE: After first cycle with error stops here to wait for channel
+			select {
+			case <-quit:
 				errorCh <- err
 				return err
+			default:
+				time.Sleep(time.Duration(periodInSeconds) * time.Second)
+				continue
 			}
-			continue
 		}
 
 		defer response.Body.Close()

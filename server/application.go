@@ -59,6 +59,7 @@ func StartApplication() {
 	rwMutex := &sync.RWMutex{}
 	stopOnError := make(chan bool)
 	errorCh := make(chan error)
+
 	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex, stopOnError, errorCh)
 
 	// Create Router
@@ -68,7 +69,6 @@ func StartApplication() {
 
 	// Start Server
 	router.Run(":" + config.ServerConfigValues.Server.Port)
-
 }
 
 func inititalizeDb() {
