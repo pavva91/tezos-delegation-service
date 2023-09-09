@@ -26,10 +26,13 @@ import (
 //	@externalDocs.description	OpenAPI
 //	@externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
-	// For activating debug
+	// NOTE: For activating debug
 	// <F5> then:
 	//	1. 2 (debug with argument)
 	//	2. d
+	// NOTE: For deactivating debug (terminate session)
+	// <F5> then select:
+	// - Terminate Session (usually 2 if thread is stopped, 1 if thread is not stopped)
 	isDebug := false
 	if len(os.Args) == 2 {
 		debugArg := os.Args[1]
