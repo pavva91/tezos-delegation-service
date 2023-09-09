@@ -40,10 +40,10 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	for _, r := range delegations {
 		// TODO: Check if is a replicate before adding to DB
 		delegationModel := r.ToModel()
-		// NOTE: I Use gorm that is Thread-Safe, so a RWMutex is not needed on my side, 
+		// NOTE: I Use gorm that is Thread-Safe, so a RWMutex is not needed on my side,
 		// I just add it for showing what I would have done if I had to handle myself race conditions
 		rwmu.Lock()
-		// NOTE: I could use defer rwmu.Unlock() 
+		// NOTE: I could use defer rwmu.Unlock()
 		// In this case I prefer to make the 2 explicit calls
 		createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
 		if err != nil {
@@ -60,6 +60,8 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 
 func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
 
+	// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
+	// oldTime = time.Now().UTC().Add(-time.Minute * 2)
 	oldTime := time.Now().UTC()
 	client := http.Client{
 		Timeout: 5 * time.Second,
@@ -72,6 +74,8 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		default:
 			// log.Info().Msg("Continue polling")
 		}
+		// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
+		// newTime = time.Now().UTC().Add(-time.Minute * 2)
 		newTime := time.Now().UTC()
 
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
