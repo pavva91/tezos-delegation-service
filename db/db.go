@@ -30,15 +30,8 @@ func (dbOrm dbOrmImpl) ConnectToDB(cfg config.ServerConfig) {
 		panic(err)
 	}
 	db.Logger.LogMode(logger.Info)
-	// TODO: Fix circular dependency if I put AutoMigrate here
-	// FIX: move to mani.go
-	// db.AutoMigrate(&models.User{}, &models.Event{})
 	database = db
 }
-
-// func Migrate() {
-// 	database.AutoMigrate(&models.User{}, &models.Event{})
-// }
 
 func (dbOrm dbOrmImpl) GetDB() *gorm.DB {
 	return database

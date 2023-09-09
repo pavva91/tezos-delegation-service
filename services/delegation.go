@@ -38,12 +38,17 @@ func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.D
 func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync.RWMutex) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
 	for _, r := range delegations {
-		delegationModel := r.ToModel()
 		// TODO: Check if is a replicate before adding to DB
+		delegationModel := r.ToModel()
+		// NOTE: I Use gorm that is Thread-Safe, so a RWMutex is not needed on my side, 
+		// I just add it for showing what I would have done if I had to handle myself race conditions
 		rwmu.Lock()
+		// NOTE: I could use defer rwmu.Unlock() 
+		// In this case I prefer to make the 2 explicit calls
 		createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
 		if err != nil {
 			log.Info().Err(err).Msg("Error Creating Delegation in DB")
+			rwmu.Unlock()
 			return nil, err
 		}
 		rwmu.Unlock()
@@ -53,7 +58,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, interruptSignalCh <-chan struct{}) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
 
 	oldTime := time.Now().UTC()
 	client := http.Client{
@@ -62,7 +67,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 
 	for {
 		select {
-		case <-interruptSignalCh:
+		case <-quitOnErrorSignalCh:
 			quitOnError = true
 		default:
 			// log.Info().Msg("Continue polling")

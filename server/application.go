@@ -43,8 +43,8 @@ func StartApplication() {
 	}
 
 	// Set Swagger Info
-	docs.SwaggerInfo.Title = "Swagger Example API"
-	docs.SwaggerInfo.Description = "Insert here REST API Description"
+	docs.SwaggerInfo.Title = "Tezos Delegation Service"
+	docs.SwaggerInfo.Description = "Service that gathers new delegations made on the Tezos protocol"
 	docs.SwaggerInfo.Version = "0.0.1"
 	docs.SwaggerInfo.BasePath = fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.ApiPath, config.ServerConfigValues.Server.ApiVersion)
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", config.ServerConfigValues.Server.Host, config.ServerConfigValues.Server.Port)
@@ -59,9 +59,9 @@ func StartApplication() {
 	rwMutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
-	interruptSignalCh := make(chan struct{})
+	quitOnErrorSignalCh := make(chan struct{})
 
-	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex, stopOnError, errorCh, interruptSignalCh)
+	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, rwMutex, stopOnError, errorCh, quitOnErrorSignalCh)
 
 	// Create Router
 	router := NewRouter()
