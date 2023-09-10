@@ -61,18 +61,15 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 
 func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
 
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+
 	// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
 	// oldTime := time.Now().UTC()
 	oldTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
 
-	log.Info().Msg(time.Now().UTC().Format(time.RFC3339))
-	log.Info().Msg(oldTime.Format(time.RFC3339))
-
 	time.Sleep(time.Duration(periodInSeconds) * time.Second)
-
-	client := http.Client{
-		Timeout: 5 * time.Second,
-	}
 
 	for {
 		select {
