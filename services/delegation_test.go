@@ -88,7 +88,7 @@ func Test_ListDelegations_YearIsZeroEmptyList_Empty(t *testing.T) {
 
 func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 	wrongApiEndpoint := "wrong"
-	pollPeriodInSeconds := 1
+	pollPeriodInSeconds := uint(1)
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "unsupported protocol scheme"
 	rwmutex := &sync.RWMutex{}
@@ -110,7 +110,7 @@ func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 
 func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
 	wrongApiEndpoint := "http://wrong"
-	pollPeriodInSeconds := 1
+	pollPeriodInSeconds := uint(1)
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "dial tcp: lookup wrong: no such host"
 	rwmutex := &sync.RWMutex{}
@@ -134,7 +134,7 @@ func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
 }
 
 func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
-	pollPeriodInSeconds := 1
+	pollPeriodInSeconds := uint(1)
 	errorHttpStatus := http.StatusBadRequest
 	expectedError := "Get Response different than 200: " + strconv.Itoa(errorHttpStatus)
 	rwmutex := &sync.RWMutex{}
@@ -164,7 +164,7 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 }
 
 func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
-	pollPeriodInSeconds := 1
+	pollPeriodInSeconds := uint(1)
 	unexpectedJSON := []byte(`{"value":"fixed"}`)
 	expectedError := "json: cannot unmarshal object into Go value of type []dto.DelegationResponseFromApi"
 	rwmutex := &sync.RWMutex{}
@@ -189,7 +189,7 @@ func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
 }
 
 func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
-	pollPeriodInSeconds := 1
+	pollPeriodInSeconds := uint(1)
 	emptyListDelegations := []dto.DelegationResponseFromApi{}
 	jsonResponse, err := json.Marshal(emptyListDelegations)
 	if err != nil {

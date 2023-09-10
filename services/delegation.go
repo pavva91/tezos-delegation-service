@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pavva91/tezos-delegation-service/config"
 	"github.com/pavva91/tezos-delegation-service/dto"
 	"github.com/pavva91/tezos-delegation-service/models"
 	"github.com/pavva91/tezos-delegation-service/repositories"
@@ -22,7 +23,7 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(int, string, *sync.RWMutex, bool, chan<- error, <-chan struct{}) error
+	PollDelegations(uint, string, *sync.RWMutex, bool, chan<- error, <-chan struct{}) error
 }
 
 type delegationServiceImpl struct{}
@@ -58,11 +59,17 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
 
 	// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
-	// oldTime = time.Now().UTC().Add(-time.Minute * 2)
-	oldTime := time.Now().UTC()
+	// oldTime := time.Now().UTC()
+	oldTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
+
+	log.Info().Msg(time.Now().UTC().Format(time.RFC3339))
+	log.Info().Msg(oldTime.Format(time.RFC3339))
+
+	time.Sleep(time.Duration(periodInSeconds) * time.Second)
+
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -74,14 +81,14 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		default:
 			// log.Info().Msg("Continue polling")
 		}
-		// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
-		// newTime = time.Now().UTC().Add(-time.Minute * 2)
-		newTime := time.Now().UTC()
+		// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before
+		// newTime := time.Now().UTC()
+		newTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
 
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
-			log.Info().Err(err).Msg("Connectivity Error - No response from request")
+			log.Error().Err(err).Msg("Connectivity Error - No response from request")
 			if quitOnError {
 				errorCh <- err
 				return err
@@ -92,7 +99,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		}
 		if response.StatusCode != http.StatusOK {
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
-			log.Info().Err(err).Msg("")
+			log.Error().Err(err).Msg("")
 			if quitOnError {
 				errorCh <- err
 				return err
@@ -105,14 +112,14 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds int, apiEnd
 		defer response.Body.Close()
 		responseBody, err := io.ReadAll(response.Body)
 		if err != nil {
-			log.Info().Err(err).Msg("Error reading response body")
+			log.Error().Err(err).Msg("Error reading response body")
 			return err
 		}
 
 		var results []dto.DelegationResponseFromApi
 		err = json.Unmarshal(responseBody, &results)
 		if err != nil {
-			log.Info().Err(err).Msg("Cannot unmarshal JSON")
+			log.Error().Err(err).Msg("Cannot unmarshal JSON")
 			return err
 		}
 

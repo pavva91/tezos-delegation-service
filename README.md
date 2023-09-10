@@ -272,3 +272,9 @@ SELECT * FROM delegations ORDER BY "timestamp" DESC
 ```sql
 SELECT * FROM delegations WHERE EXTRACT(YEAR FROM timestamp) = 2023
 ```
+
+### Check vulnerabilities
+
+```bash
+govulncheck ./...
+```
