@@ -119,6 +119,36 @@ Setup 3 environments: dev, stage and prod
 2. `cd <project_root>`
 3. `SERVER_ENVIRONMENT="prod" bin/app-amd64-linux`
 
+## DB Management
+
+### PostgreSQL Database
+
+#### SQL
+
+Queries:
+
+1. List Delegations by most recent first
+
+```sql
+SELECT * FROM delegations ORDER BY "timestamp" DESC
+```
+
+2. List delegations by year
+
+```sql
+SELECT * FROM delegations WHERE EXTRACT(YEAR FROM timestamp) = 2023
+```
+
+### DB Management inside neovim (vim-dadbod)
+
+DB Management inside neovim through dadbod ([tpope/vim-dadbod](https://github.com/tpope/vim-dadbod), [kristijanhusak/vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui), [kristijanhusak/vim-dadbod-completion](https://github.com/kristijanhusak/vim-dadbod-completion)):
+
+1. `:DBUI` (\<leader\>db is `:DBUIToggle`)
+2. Connection to db (Add connection):
+   - `postgres://\<user\>:\<password\>@localhost:\<port\>/\<db_name\>`
+3. In case of default values (dev db)
+   - `postgres://postgres:localhost@localhost:5432/postgres`
+
 ## REST API
 
 Uses [Gin-Gonic](https://gin-gonic.com/docs/)
@@ -255,26 +285,15 @@ DB Management inside neovim through dadbod ([tpope/vim-dadbod](https://github.co
 3. In case of default values (dev db)
    - `postgres://postgres:localhost@localhost:5432/postgres`
 
-### PostgreSQL Database
-
-#### SQL
-
-Queries:
-
-1. List Delegations by most recent first
-
-```sql
-SELECT * FROM delegations ORDER BY "timestamp" DESC
-```
-
-2. List delegations by year
-
-```sql
-SELECT * FROM delegations WHERE EXTRACT(YEAR FROM timestamp) = 2023
-```
-
-### Check vulnerabilities
+## Check vulnerabilities
 
 ```bash
 govulncheck ./...
+```
+
+## Run Local Go Doc
+
+```bash
+go install golang.org/x/tools/cmd/godoc@latest
+godoc -http=:6060
 ```

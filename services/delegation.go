@@ -23,7 +23,8 @@ var (
 
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
-	PollDelegations(uint, string, *sync.RWMutex, bool, chan<- error, <-chan struct{}) error
+	// PollDelegations Fuction that runs asynchronously for polling delegations
+	PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error
 }
 
 type delegationServiceImpl struct{}
@@ -59,7 +60,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorCh chan<- error, quitOnErrorSignalCh <-chan struct{}) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error {
 
 	client := http.Client{
 		Timeout: 5 * time.Second,
@@ -68,12 +69,13 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEn
 	// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
 	// oldTime := time.Now().UTC()
 	oldTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
+	log.Info().Msg("Starting time polling: " + oldTime.Format(time.RFC3339Nano))
 
 	time.Sleep(time.Duration(periodInSeconds) * time.Second)
 
 	for {
 		select {
-		case <-quitOnErrorSignalCh:
+		case <-quitOnErrorTrueSignalInCh:
 			quitOnError = true
 		default:
 			// log.Info().Msg("Continue polling")
@@ -87,7 +89,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEn
 		if err != nil {
 			log.Error().Err(err).Msg("Connectivity Error - No response from request")
 			if quitOnError {
-				errorCh <- err
+				errorOutCh <- err
 				return err
 			} else {
 				time.Sleep(time.Duration(periodInSeconds) * time.Second)
@@ -98,7 +100,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEn
 			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
 			log.Error().Err(err).Msg("")
 			if quitOnError {
-				errorCh <- err
+				errorOutCh <- err
 				return err
 			} else {
 				time.Sleep(time.Duration(periodInSeconds) * time.Second)
