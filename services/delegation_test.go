@@ -109,10 +109,10 @@ func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 }
 
 func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
-	wrongApiEndpoint := "http://wrong"
+	wrongApiEndpoint := "http://wrong-api-endpoint"
 	pollPeriodInSeconds := uint(1)
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
-	expectedErrorContent2 := "dial tcp: lookup wrong: no such host"
+	expectedErrorContent2 := "dial tcp: lookup " + wrongApiEndpoint[7:]
 	rwmutex := &sync.RWMutex{}
 	// TODO: stopOnError becomes a boolean
 	stopOnError := false
