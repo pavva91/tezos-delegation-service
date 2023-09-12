@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/pavva91/tezos-delegation-service/config"
@@ -24,7 +23,7 @@ var (
 type DelegationServiceInterface interface {
 	ListDelegations(year time.Time) ([]models.Delegation, error)
 	// PollDelegations Fuction that runs asynchronously for polling delegations
-	PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error
+	PollDelegations(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error
 }
 
 type delegationServiceImpl struct{}
@@ -37,30 +36,30 @@ func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.D
 	}
 }
 
-func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi, rwmu *sync.RWMutex) ([]models.Delegation, error) {
+func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
 	for _, r := range delegations {
 		// TODO: Check if is a replicate before adding to DB
 		delegationModel := r.ToModel()
 		// NOTE: I Use gorm that is Thread-Safe, so a RWMutex is not needed on my side,
 		// I just add it for showing what I would have done if I had to handle myself race conditions
-		rwmu.Lock()
+		// rwmu.Lock()
 		// NOTE: I could use defer rwmu.Unlock()
 		// In this case I prefer to make the 2 explicit calls
 		createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
 		if err != nil {
 			log.Info().Err(err).Msg("Error Creating Delegation in DB")
-			rwmu.Unlock()
+			// rwmu.Unlock()
 			return nil, err
 		}
-		rwmu.Unlock()
+		// rwmu.Unlock()
 		savedDelegations = append(savedDelegations, *delegationModel)
 		log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(createdDelegation.ID)))
 	}
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, rwmu *sync.RWMutex, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error {
+func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error {
 
 	client := http.Client{
 		Timeout: 5 * time.Second,
@@ -122,7 +121,7 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEn
 			return err
 		}
 
-		savedDelegations, err := SaveBulkDelegations(results, rwmu)
+		savedDelegations, err := SaveBulkDelegations(results)
 		if err != nil {
 			return err
 		}

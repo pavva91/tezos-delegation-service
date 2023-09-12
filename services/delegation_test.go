@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strconv"
-	"sync"
 	"testing"
 	"time"
 
@@ -91,12 +90,11 @@ func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 	pollPeriodInSeconds := uint(1)
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "unsupported protocol scheme"
-	rwmutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex, stopOnError, errorCh, interruptCh)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	interruptCh <- struct{}{}
@@ -113,14 +111,13 @@ func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
 	pollPeriodInSeconds := uint(1)
 	expectedErrorContent1 := "Get \"" + wrongApiEndpoint + "/operations/delegations?timestamp.ge="
 	expectedErrorContent2 := "dial tcp: lookup " + wrongApiEndpoint[7:]
-	rwmutex := &sync.RWMutex{}
 	// TODO: stopOnError becomes a boolean
 	stopOnError := false
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
 	// TODO: create channel token to send signal
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, rwmutex, stopOnError, errorCh, interruptCh)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	// TODO: create channel token to send signal
@@ -137,7 +134,6 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 	pollPeriodInSeconds := uint(1)
 	errorHttpStatus := http.StatusBadRequest
 	expectedError := "Get Response different than 200: " + strconv.Itoa(errorHttpStatus)
-	rwmutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
@@ -152,7 +148,7 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 	}))
 	defer server.Close()
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh, interruptCh)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(3 * time.Second)
 	interruptCh <- struct{}{}
@@ -167,7 +163,6 @@ func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
 	pollPeriodInSeconds := uint(1)
 	unexpectedJSON := []byte(`{"value":"fixed"}`)
 	expectedError := "json: cannot unmarshal object into Go value of type []dto.DelegationResponseFromApi"
-	rwmutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
@@ -181,7 +176,7 @@ func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
 	}))
 	defer server.Close()
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh, interruptCh)
+	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -197,7 +192,6 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 	}
 	// NOTE: error: "Get \"http://127.0.0.1:45969/operations/delegations?timestamp.ge=2023-09-07T08:49:59Z&timestamp.lt=2023-09-07T08:50:01Z\": dial tcp 127.0.0.1:45969: connect: connection refused"
 	expectedErrorContent1 := "connect: connection refused"
-	rwmutex := &sync.RWMutex{}
 	stopOnError := false
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
@@ -217,7 +211,7 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 
 	defer server.Close()
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, rwmutex, stopOnError, errorCh, interruptCh)
+	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	interruptCh <- struct{}{}
@@ -230,9 +224,8 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 
 func Test_SaveBulkDelegations_EmptySlice_NoError(t *testing.T) {
 	var emptyList []dto.DelegationResponseFromApi
-	rwmutex := &sync.RWMutex{}
 
-	savedDelegations, err := SaveBulkDelegations(emptyList, rwmutex)
+	savedDelegations, err := SaveBulkDelegations(emptyList)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 0, len(savedDelegations))
@@ -242,7 +235,6 @@ func Test_SaveBulkDelegations_ErrorFromRepositoryCreate_Error(t *testing.T) {
 	var emptyList []dto.DelegationResponseFromApi
 	delegation1 := dto.DelegationResponseFromApi{}
 	listOneElement := append(emptyList, delegation1)
-	rwmutex := &sync.RWMutex{}
 
 	errorMessage := "Unexpected Internal Error"
 	unexpectedError := errors.New(errorMessage)
@@ -253,7 +245,7 @@ func Test_SaveBulkDelegations_ErrorFromRepositoryCreate_Error(t *testing.T) {
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	savedDelegations, err := SaveBulkDelegations(listOneElement, rwmutex)
+	savedDelegations, err := SaveBulkDelegations(listOneElement)
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -266,7 +258,6 @@ func Test_SaveBulkDelegations_OKList1Element_ReturnSavedDelegation(t *testing.T)
 	delegation := dto.DelegationResponseFromApi{}
 	delegationModel1 := models.Delegation{}
 	listOneElement := append(emptyList, delegation)
-	rwmutex := &sync.RWMutex{}
 
 	delegationRepositoryStub := stubs.DelegationRepositoryStub{}
 	delegationRepositoryStub.CreateFn = func(*models.Delegation) (*models.Delegation, error) {
@@ -274,7 +265,7 @@ func Test_SaveBulkDelegations_OKList1Element_ReturnSavedDelegation(t *testing.T)
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	savedDelegations, err := SaveBulkDelegations(listOneElement, rwmutex)
+	savedDelegations, err := SaveBulkDelegations(listOneElement)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(savedDelegations))
@@ -286,7 +277,6 @@ func Test_SaveBulkDelegations_OKList2Element_ReturnSavedDelegation(t *testing.T)
 	delegationModel1 := models.Delegation{}
 	delegations = append(delegations, delegation)
 	delegations = append(delegations, delegation)
-	rwmutex := &sync.RWMutex{}
 
 	delegationRepositoryStub := stubs.DelegationRepositoryStub{}
 	delegationRepositoryStub.CreateFn = func(*models.Delegation) (*models.Delegation, error) {
@@ -294,7 +284,7 @@ func Test_SaveBulkDelegations_OKList2Element_ReturnSavedDelegation(t *testing.T)
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	savedDelegations, err := SaveBulkDelegations(delegations, rwmutex)
+	savedDelegations, err := SaveBulkDelegations(delegations)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(savedDelegations))
