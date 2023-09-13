@@ -4,7 +4,6 @@ import (
 	// docs "github.com/pavva91/tezos-delegation-service/docs"
 
 	"os"
-	"runtime"
 	"strconv"
 
 	"github.com/pavva91/tezos-delegation-service/server"
@@ -24,8 +23,8 @@ import (
 
 //	@securityDefinitions.basic	BasicAuth
 
-//	@externalDocs.description	OpenAPI
-//	@externalDocs.url			https://swagger.io/resources/open-api/
+// @externalDocs.description	OpenAPI
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func main() {
 	// NOTE: For activating debug
 	// <F5> then:
@@ -43,6 +42,6 @@ func main() {
 		}
 	}
 	log.Info().Msg("Debug mode: " + strconv.FormatBool(isDebug))
-	log.Info().Msg("GOMAXPROCS: " + strconv.Itoa(runtime.GOMAXPROCS(0)))
+	// log.Info().Msg("GOMAXPROCS: " + strconv.Itoa(runtime.GOMAXPROCS(0)))
 	server.StartApplication()
 }
