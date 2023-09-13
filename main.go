@@ -4,6 +4,7 @@ import (
 	// docs "github.com/pavva91/tezos-delegation-service/docs"
 
 	"os"
+	"runtime"
 	"strconv"
 
 	"github.com/pavva91/tezos-delegation-service/server"
@@ -42,5 +43,6 @@ func main() {
 		}
 	}
 	log.Info().Msg("Debug mode: " + strconv.FormatBool(isDebug))
+	log.Info().Msg("GOMAXPROCS: " + strconv.Itoa(runtime.GOMAXPROCS(0)))
 	server.StartApplication()
 }

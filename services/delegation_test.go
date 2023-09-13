@@ -240,8 +240,8 @@ func Test_SaveBulkDelegations_ErrorFromRepositoryCreate_Error(t *testing.T) {
 	unexpectedError := errors.New(errorMessage)
 
 	delegationRepositoryStub := stubs.DelegationRepositoryStub{}
-	delegationRepositoryStub.CreateFn = func(*models.Delegation) (*models.Delegation, error) {
-		return nil, unexpectedError
+	delegationRepositoryStub.CreateFn = func(*models.Delegation) error {
+		return unexpectedError
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
@@ -256,12 +256,11 @@ func Test_SaveBulkDelegations_ErrorFromRepositoryCreate_Error(t *testing.T) {
 func Test_SaveBulkDelegations_OKList1Element_ReturnSavedDelegation(t *testing.T) {
 	var emptyList []dto.DelegationResponseFromApi
 	delegation := dto.DelegationResponseFromApi{}
-	delegationModel1 := models.Delegation{}
 	listOneElement := append(emptyList, delegation)
 
 	delegationRepositoryStub := stubs.DelegationRepositoryStub{}
-	delegationRepositoryStub.CreateFn = func(*models.Delegation) (*models.Delegation, error) {
-		return &delegationModel1, nil
+	delegationRepositoryStub.CreateFn = func(*models.Delegation) error {
+		return nil
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
@@ -274,13 +273,12 @@ func Test_SaveBulkDelegations_OKList1Element_ReturnSavedDelegation(t *testing.T)
 func Test_SaveBulkDelegations_OKList2Element_ReturnSavedDelegation(t *testing.T) {
 	var delegations []dto.DelegationResponseFromApi
 	delegation := dto.DelegationResponseFromApi{}
-	delegationModel1 := models.Delegation{}
 	delegations = append(delegations, delegation)
 	delegations = append(delegations, delegation)
 
 	delegationRepositoryStub := stubs.DelegationRepositoryStub{}
-	delegationRepositoryStub.CreateFn = func(*models.Delegation) (*models.Delegation, error) {
-		return &delegationModel1, nil
+	delegationRepositoryStub.CreateFn = func(*models.Delegation) error {
+		return nil
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 

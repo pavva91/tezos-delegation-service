@@ -14,7 +14,7 @@ var (
 type DelegationRepositoryInterface interface {
 	List() ([]models.Delegation, error)
 	ListByYear(year time.Time) ([]models.Delegation, error)
-	Create(delegation *models.Delegation) (*models.Delegation, error)
+	Create(delegation *models.Delegation) error
 }
 
 type delegationRepositoryImpl struct{}
@@ -37,10 +37,6 @@ func (repository delegationRepositoryImpl) ListByYear(year time.Time) ([]models.
 	return delegations, nil
 }
 
-func (repository delegationRepositoryImpl) Create(delegation *models.Delegation) (*models.Delegation, error) {
-	err := db.DbOrm.GetDB().Create(&delegation).Error
-	if err != nil {
-		return nil, err
-	}
-	return delegation, nil
+func (repository delegationRepositoryImpl) Create(delegation *models.Delegation) error {
+	return db.DbOrm.GetDB().Create(&delegation).Error
 }

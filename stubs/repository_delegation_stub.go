@@ -9,7 +9,7 @@ import (
 type DelegationRepositoryStub struct {
 	ListFn       func() ([]models.Delegation, error)
 	ListByYearFn func(time.Time) ([]models.Delegation, error)
-	CreateFn     func(*models.Delegation) (*models.Delegation, error)
+	CreateFn     func(*models.Delegation) error
 }
 
 func (stub DelegationRepositoryStub) List() ([]models.Delegation, error) {
@@ -20,6 +20,6 @@ func (stub DelegationRepositoryStub) ListByYear(year time.Time) ([]models.Delega
 	return stub.ListByYearFn(year)
 }
 
-func (stub DelegationRepositoryStub) Create(delegation *models.Delegation) (*models.Delegation, error) {
+func (stub DelegationRepositoryStub) Create(delegation *models.Delegation) error {
 	return stub.CreateFn(delegation)
 }

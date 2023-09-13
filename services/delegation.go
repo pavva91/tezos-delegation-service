@@ -38,15 +38,15 @@ func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.D
 
 func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
-	for _, r := range delegations {
+	for _, d := range delegations {
 		// TODO: Check if is a replicate before adding to DB
-		delegationModel := r.ToModel()
+		delegationModel := d.ToModel()
 		// NOTE: I Use gorm that is Thread-Safe, so a RWMutex is not needed on my side,
 		// I just add it for showing what I would have done if I had to handle myself race conditions
 		// rwmu.Lock()
 		// NOTE: I could use defer rwmu.Unlock()
 		// In this case I prefer to make the 2 explicit calls
-		createdDelegation, err := repositories.DelegationRepository.Create(delegationModel)
+		err := repositories.DelegationRepository.Create(delegationModel)
 		if err != nil {
 			log.Info().Err(err).Msg("Error Creating Delegation in DB")
 			// rwmu.Unlock()
@@ -54,7 +54,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.
 		}
 		// rwmu.Unlock()
 		savedDelegations = append(savedDelegations, *delegationModel)
-		log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(createdDelegation.ID)))
+		log.Info().Msg("Delegation Created Correctly: " + strconv.Itoa(int(delegationModel.ID)))
 	}
 	return savedDelegations, nil
 }
