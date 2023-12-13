@@ -72,6 +72,23 @@ Try the running application directly on the Swagger API:
 
 - `http://localhost:8080/swagger/index.html#/`
 
+## Linter
+
+The linter will help to write idiomatic go. On project root run:
+
+```bash
+golangci-lint run
+```
+
+The linter configuration is: `.golangci.yml`
+
+```yaml
+linters:
+  enable-all: true
+```
+
+## Tests
+
 ### Run All Tests
 
 Run all tests and open results on browser:
