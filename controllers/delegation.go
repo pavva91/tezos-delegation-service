@@ -29,31 +29,34 @@ type delegationController struct{}
 //	@Failure		400		{object}	errorhandling.SimpleErrorMessage
 //	@Failure		500		{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
-func (controller delegationController) ListDelegations(ctx *gin.Context) {
+func (controller delegationController) ListDelegations(c *gin.Context) {
 	var queryParameters ListDelegationsQueryParameters
-	err := ctx.ShouldBind(&queryParameters)
+	err := c.ShouldBind(&queryParameters)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to Parse Query Parameters")
 		errorMessage := errorhandling.SimpleErrorMessage{Message: err.Error()}
-		ctx.JSON(http.StatusBadRequest, errorMessage)
-		ctx.Abort()
+		c.JSON(http.StatusBadRequest, errorMessage)
+		c.Abort()
+
 		return
 	}
+	
 	delegations, err := services.DelegationService.ListDelegations(queryParameters.Year)
+
 	if err != nil {
 		log.Err(err).Msg("Error listing delegations")
 		errorMessage := errorhandling.SimpleErrorMessage{Message: "Error to list delegations"}
-		ctx.JSON(http.StatusInternalServerError, errorMessage)
-		ctx.Abort()
+		c.JSON(http.StatusInternalServerError, errorMessage)
+		c.Abort()
+
 		return
 	}
 	delegationResponses := new(dto.DelegationResponse).ToDtos(delegations)
 	response := dto.DataDelegationSliceResponse{
 		Data: delegationResponses,
 	}
-	ctx.JSON(http.StatusOK, &response)
-	ctx.Abort()
-	return
+	c.JSON(http.StatusOK, &response)
+	c.Abort()
 }
 
 type ListDelegationsQueryParameters struct {

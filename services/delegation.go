@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -31,13 +30,13 @@ type delegationServiceImpl struct{}
 func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.Delegation, error) {
 	if year.IsZero() {
 		return repositories.DelegationRepository.List()
-	} else {
-		return repositories.DelegationRepository.ListByYear(year)
 	}
+	return repositories.DelegationRepository.ListByYear(year)
 }
 
 func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
+
 	for _, d := range delegations {
 		// TODO: Check if is a replicate before adding to DB
 		delegationModel := d.ToModel()
@@ -50,7 +49,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.
 		if err != nil {
 			log.Info().Err(err).Msg("Error Creating Delegation in DB")
 			// rwmu.Unlock()
-			return nil, err
+			return nil, fmt.Errorf("run error: %w", err)
 		}
 		// rwmu.Unlock()
 		savedDelegations = append(savedDelegations, *delegationModel)
@@ -87,30 +86,38 @@ func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEn
 		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
 			log.Error().Err(err).Msg("Connectivity Error - No response from request")
+
 			if quitOnError {
 				errorOutCh <- err
+
 				return err
-			} else {
-				time.Sleep(time.Duration(periodInSeconds) * time.Second)
-				continue
 			}
+			time.Sleep(time.Duration(periodInSeconds) * time.Second)
+
+			continue
 		}
+
 		if response.StatusCode != http.StatusOK {
-			err := errors.New("Get Response different than 200: " + strconv.Itoa(response.StatusCode))
+			err := fmt.Errorf("Get Response different than 200: %w ", err)
 			log.Error().Err(err).Msg("")
+
 			if quitOnError {
 				errorOutCh <- err
+
 				return err
-			} else {
-				time.Sleep(time.Duration(periodInSeconds) * time.Second)
-				continue
 			}
+
+			time.Sleep(time.Duration(periodInSeconds) * time.Second)
+
+			continue
 		}
 
 		defer response.Body.Close()
 		responseBody, err := io.ReadAll(response.Body)
+
 		if err != nil {
 			log.Error().Err(err).Msg("Error reading response body")
+
 			return err
 		}
 
