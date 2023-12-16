@@ -11,18 +11,18 @@ import (
 )
 
 var (
-	DbOrm    OrmInterface = dbOrmImpl{}
+	ORM      ORMer = orm{}
 	database *gorm.DB
 )
 
-type OrmInterface interface {
+type ORMer interface {
 	MustConnectToDB(cfg config.ServerConfig)
 	GetDB() *gorm.DB
 }
 
-type dbOrmImpl struct{}
+type orm struct{}
 
-func (dbOrm dbOrmImpl) MustConnectToDB(cfg config.ServerConfig) {
+func (o orm) MustConnectToDB(cfg config.ServerConfig) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 		cfg.Database.Host,
@@ -42,6 +42,6 @@ func (dbOrm dbOrmImpl) MustConnectToDB(cfg config.ServerConfig) {
 	database = db
 }
 
-func (dbOrm dbOrmImpl) GetDB() *gorm.DB {
+func (o orm) GetDB() *gorm.DB {
 	return database
 }
