@@ -8,7 +8,7 @@ import (
 )
 
 // NOTE: Created with https://mholt.github.io/json-to-go/
-type DelegationResponseFromApi struct {
+type DelegationResponseFromAPI struct {
 	Type      string    `json:"type"`
 	ID        int64     `json:"id"`
 	Level     int       `json:"level"`
@@ -38,7 +38,7 @@ type DelegationResponseFromApi struct {
 	} `json:"errors,omitempty"`
 }
 
-func (dto *DelegationResponseFromApi) ToModel() *models.Delegation {
+func (dto *DelegationResponseFromAPI) ToModel() *models.Delegation {
 	var delegation models.Delegation
 	delegation.Timestamp = dto.Timestamp
 	delegation.Amount = strconv.Itoa(dto.Amount)

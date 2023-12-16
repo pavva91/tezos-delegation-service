@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func MockJsonPost(c *gin.Context /* the test context */, requestBody interface{}) {
+func MockJSONPost(c *gin.Context /* the test context */, requestBody interface{}) {
 	c.Request.Method = "POST" // or PUT
 	c.Request.Header.Set("Content-Type", "application/json")
 

@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"errors"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pavva91/tezos-delegation-service/controllers"
 	"github.com/pavva91/tezos-delegation-service/models"
 	"github.com/pavva91/tezos-delegation-service/services"
 	"github.com/pavva91/tezos-delegation-service/stubs"
@@ -25,16 +26,16 @@ func Test_ListDelegations_QueryParameterYearString_400(t *testing.T) {
 	}
 	mockContext.Request.URL, _ = url.Parse("?year=" + wrongYearQueryParameterValue)
 
-	expectedHttpStatus := http.StatusBadRequest
-	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\": cannot parse \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\"\"}"
+	expectedHTTPStatus := http.StatusBadRequest
+	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\": cannot parse \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\"\"}"
 
-	Delegation.List(mockContext)
+	controllers.Delegation.List(mockContext)
 
-	actualHttpStatus := mockContext.Writer.Status()
-	actualHttpBody := response.Body.String()
+	actualHTTPStatus := mockContext.Writer.Status()
+	actualHTTPBody := response.Body.String()
 
-	assert.Equal(t, expectedHttpStatus, actualHttpStatus)
-	assert.Equal(t, expectedHttpBody, actualHttpBody)
+	assert.Equal(t, expectedHTTPStatus, actualHTTPStatus)
+	assert.Equal(t, expectedHTTPBody, actualHTTPBody)
 }
 
 func Test_ListDelegations_QueryParameterWrongDate_400(t *testing.T) {
@@ -46,17 +47,17 @@ func Test_ListDelegations_QueryParameterWrongDate_400(t *testing.T) {
 	}
 	mockContext.Request.URL, _ = url.Parse("?year=" + wrongYearQueryParameterValue)
 
-	expectedHttpStatus := http.StatusBadRequest
+	expectedHTTPStatus := http.StatusBadRequest
 	wrongYearInError := strings.Replace(wrongYearQueryParameterValue, "+", " ", 1)
-	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearInError + "\\\": extra text: \\\"" + wrongYearInError[4:] + "\\\"\"}"
+	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearInError + "\\\": extra text: \\\"" + wrongYearInError[4:] + "\\\"\"}"
 
-	Delegation.List(mockContext)
+	controllers.Delegation.List(mockContext)
 
-	actualHttpStatus := mockContext.Writer.Status()
-	actualHttpBody := response.Body.String()
+	actualHTTPStatus := mockContext.Writer.Status()
+	actualHTTPBody := response.Body.String()
 
-	assert.Equal(t, expectedHttpStatus, actualHttpStatus)
-	assert.Equal(t, expectedHttpBody, actualHttpBody)
+	assert.Equal(t, expectedHTTPStatus, actualHTTPStatus)
+	assert.Equal(t, expectedHTTPBody, actualHTTPBody)
 }
 
 func Test_ListDelegations_QueryParameterYearTrailingChars_400(t *testing.T) {
@@ -68,16 +69,16 @@ func Test_ListDelegations_QueryParameterYearTrailingChars_400(t *testing.T) {
 	}
 	mockContext.Request.URL, _ = url.Parse("?year=" + wrongYearQueryParameterValue)
 
-	expectedHttpStatus := http.StatusBadRequest
-	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\": extra text: \\\"" + wrongYearQueryParameterValue[4:] + "\\\"\"}"
+	expectedHTTPStatus := http.StatusBadRequest
+	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\": extra text: \\\"" + wrongYearQueryParameterValue[4:] + "\\\"\"}"
 
-	Delegation.List(mockContext)
+	controllers.Delegation.List(mockContext)
 
-	actualHttpStatus := mockContext.Writer.Status()
-	actualHttpBody := response.Body.String()
+	actualHTTPStatus := mockContext.Writer.Status()
+	actualHTTPBody := response.Body.String()
 
-	assert.Equal(t, expectedHttpStatus, actualHttpStatus)
-	assert.Equal(t, expectedHttpBody, actualHttpBody)
+	assert.Equal(t, expectedHTTPStatus, actualHTTPStatus)
+	assert.Equal(t, expectedHTTPBody, actualHTTPBody)
 }
 
 func Test_ListDelegations_ServiceInternalError_500(t *testing.T) {
@@ -89,23 +90,23 @@ func Test_ListDelegations_ServiceInternalError_500(t *testing.T) {
 	}
 	mockContext.Request.URL, _ = url.Parse("?year=" + correctYearQueryParameter)
 
-	expectedHttpStatus := http.StatusInternalServerError
-	expectedHttpBody := "{\"error\":\"Error to list delegations\"}"
+	expectedHTTPStatus := http.StatusInternalServerError
+	expectedHTTPBody := "{\"error\":\"Error to list delegations\"}"
 	errorMessage := "Unexpected Internal Error"
 
 	delegationServiceStub := stubs.DelegationServiceStub{}
-	delegationServiceStub.ListDelegationsFn = func(time.Time) ([]models.Delegation, error) {
+	delegationServiceStub.ListFn = func(time.Time) ([]models.Delegation, error) {
 		return nil, errors.New(errorMessage)
 	}
 	services.Delegation = delegationServiceStub
 
-	Delegation.List(mockContext)
+	controllers.Delegation.List(mockContext)
 
-	actualHttpStatus := mockContext.Writer.Status()
-	actualHttpBody := response.Body.String()
+	actualHTTPStatus := mockContext.Writer.Status()
+	actualHTTPBody := response.Body.String()
 
-	assert.Equal(t, expectedHttpStatus, actualHttpStatus)
-	assert.Equal(t, expectedHttpBody, actualHttpBody)
+	assert.Equal(t, expectedHTTPStatus, actualHTTPStatus)
+	assert.Equal(t, expectedHTTPBody, actualHTTPBody)
 }
 
 func Test_ListDelegations_OK_200(t *testing.T) {
@@ -130,22 +131,22 @@ func Test_ListDelegations_OK_200(t *testing.T) {
 	}
 	delegations = append(delegations, delegation1)
 
-	expectedHttpStatus := http.StatusOK
+	expectedHTTPStatus := http.StatusOK
 
 	delegationServiceStub := stubs.DelegationServiceStub{}
-	delegationServiceStub.ListDelegationsFn = func(time.Time) ([]models.Delegation, error) {
+	delegationServiceStub.ListFn = func(time.Time) ([]models.Delegation, error) {
 		return delegations, nil
 	}
 	services.Delegation = delegationServiceStub
 
-	Delegation.List(mockContext)
+	controllers.Delegation.List(mockContext)
 
-	actualHttpStatus := mockContext.Writer.Status()
-	actualHttpBody := response.Body.String()
+	actualHTTPStatus := mockContext.Writer.Status()
+	actualHTTPBody := response.Body.String()
 
-	assert.Equal(t, expectedHttpStatus, actualHttpStatus)
-	assert.Contains(t, actualHttpBody, delegator)
-	assert.Contains(t, actualHttpBody, amount)
-	assert.Contains(t, actualHttpBody, block)
-	assert.Contains(t, actualHttpBody, timestamp.Format(time.RFC3339Nano))
+	assert.Equal(t, expectedHTTPStatus, actualHTTPStatus)
+	assert.Contains(t, actualHTTPBody, delegator)
+	assert.Contains(t, actualHTTPBody, amount)
+	assert.Contains(t, actualHTTPBody, block)
+	assert.Contains(t, actualHTTPBody, timestamp.Format(time.RFC3339Nano))
 }

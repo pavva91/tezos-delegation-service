@@ -34,7 +34,7 @@ func NewRouter() *gin.Engine {
 		router.Use(cors.New(corsConfigStage))
 	case "prod":
 		corsConfigProd := cors.DefaultConfig()
-		corsConfigProd.AllowOrigins = config.ServerConfigValues.Server.CorsAllowedClients
+		corsConfigProd.AllowOrigins = config.ServerConfigValues.Server.CORSAllowedClients
 		router.Use(cors.New(corsConfigProd))
 	default:
 		log.Error().Msg(fmt.Sprintf("Incorrect Dev Environment: %s\nInterrupt execution", env))
@@ -45,6 +45,6 @@ func NewRouter() *gin.Engine {
 }
 
 func MapUrls() {
-	apiVersion := fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.ApiPath, config.ServerConfigValues.Server.ApiVersion)
+	apiVersion := fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.APIPath, config.ServerConfigValues.Server.APIVersion)
 	mapUrls(apiVersion)
 }

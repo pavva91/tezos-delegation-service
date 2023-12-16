@@ -1,4 +1,4 @@
-package controllers
+package controllers_test
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/pavva91/tezos-delegation-service/controllers"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -17,7 +17,7 @@ type HealthTestSuite struct {
 	suite.Suite
 	GinContextPointer  *gin.Context
 	GinEnginePointer   *gin.Engine
-	HttpResponseWriter http.ResponseWriter
+	HTTPResponseWriter http.ResponseWriter
 	Response           *httptest.ResponseRecorder
 }
 
@@ -31,16 +31,18 @@ func (suite *HealthTestSuite) SetupTest() {
 }
 
 func (suite *HealthTestSuite) Test_Status_Return200() {
-	expectedHttpStatus := http.StatusOK
-	expectedHttpBody := "Working!"
+	expectedHTTPStatus := http.StatusOK
+	expectedHTTPBody := "Working!"
 
-	Health.Status(suite.GinContextPointer)
+	controllers.Health.Status(suite.GinContextPointer)
 
-	actualHttpStatus := suite.GinContextPointer.Writer.Status()
-	actualHttpBody := suite.Response.Body.String()
+	actualHTTPStatus := suite.GinContextPointer.Writer.Status()
+	actualHTTPBody := suite.Response.Body.String()
 
-	assert.Equal(suite.T(), actualHttpStatus, expectedHttpStatus)
-	assert.Equal(suite.T(), actualHttpBody, expectedHttpBody)
+	suite.Equal(expectedHTTPStatus,actualHTTPStatus)
+	suite.Equal(expectedHTTPBody,actualHTTPBody)
+	// assert.Equal(suite.T(), expectedHTTPStatus,  actualHTTPStatus)
+	// assert.Equal(suite.T(), expectedHTTPBody,  actualHTTPBody)
 }
 
 // In order for 'go test' to run this suite, we need to create

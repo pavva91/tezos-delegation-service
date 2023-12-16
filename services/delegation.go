@@ -29,12 +29,12 @@ type delegation struct{}
 
 func (s delegation) List(year time.Time) ([]models.Delegation, error) {
 	if year.IsZero() {
-		return repositories.DelegationRepository.List()
+		return repositories.Delegation.List()
 	}
-	return repositories.DelegationRepository.ListByYear(year)
+	return repositories.Delegation.ListByYear(year)
 }
 
-func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.Delegation, error) {
+func SaveBulkDelegations(delegations []dto.DelegationResponseFromAPI) ([]models.Delegation, error) {
 	var savedDelegations []models.Delegation
 
 	for _, d := range delegations {
@@ -45,11 +45,11 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.
 		// rwmu.Lock()
 		// NOTE: I could use defer rwmu.Unlock()
 		// In this case I prefer to make the 2 explicit calls
-		err := repositories.DelegationRepository.Create(delegationModel)
+		err := repositories.Delegation.Create(delegationModel)
 		if err != nil {
-			log.Info().Err(err).Msg("Error Creating Delegation in DB")
+			log.Info().Err(err).Msg("error creating delegation in db")
 			// rwmu.Unlock()
-			return nil, fmt.Errorf("run error: %w", err)
+			return nil, fmt.Errorf("repository error: %w", err)
 		}
 		// rwmu.Unlock()
 		savedDelegations = append(savedDelegations, *delegationModel)
@@ -66,7 +66,7 @@ func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError b
 
 	// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before:
 	// oldTime := time.Now().UTC()
-	oldTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
+	oldTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.APIDelegations.DelayLocalTimestampInSeconds))
 	log.Info().Msg("Starting time polling: " + oldTime.Format(time.RFC3339Nano))
 
 	time.Sleep(time.Duration(periodInSeconds) * time.Second)
@@ -80,12 +80,12 @@ func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError b
 		}
 		// NOTE: Using Now() can be a problem if timestamp are not in sync within servers. To be on the safe side, if there's no strict performance boundary is to put now a couple of minutes before
 		// newTime := time.Now().UTC()
-		newTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.ApiDelegations.DelayLocalTimestampInSeconds))
+		newTime := time.Now().UTC().Add(-time.Second * time.Duration(config.ServerConfigValues.APIDelegations.DelayLocalTimestampInSeconds))
 
 		// NOTE: Here I call only the date greater than previous call date (old timeNow) https://api.tzkt.io/v1/operations/delegations?timestamp.gt=2020-02-20T02:40:57Z
 		response, err := client.Get(apiEndpoint + "/operations/delegations?timestamp.ge=" + oldTime.Format(time.RFC3339) + "&timestamp.lt=" + newTime.Format(time.RFC3339))
 		if err != nil {
-			log.Error().Err(err).Msg("Connectivity Error - No response from request")
+			log.Error().Err(err).Msg("connectivity error - no response from request")
 
 			if quitOnError {
 				errorOutCh <- err
@@ -98,7 +98,7 @@ func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError b
 		}
 
 		if response.StatusCode != http.StatusOK {
-			err := fmt.Errorf("Get Response different than 200: %w ", err)
+			err := fmt.Errorf("get response different than 200: %w ", err)
 			log.Error().Err(err).Msg("")
 
 			if quitOnError {
@@ -116,15 +116,15 @@ func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError b
 		responseBody, err := io.ReadAll(response.Body)
 
 		if err != nil {
-			log.Error().Err(err).Msg("Error reading response body")
+			log.Error().Err(err).Msg("error reading response body")
 
 			return err
 		}
 
-		var results []dto.DelegationResponseFromApi
+		var results []dto.DelegationResponseFromAPI
 		err = json.Unmarshal(responseBody, &results)
 		if err != nil {
-			log.Error().Err(err).Msg("Cannot unmarshal JSON")
+			log.Error().Err(err).Msg("cannot unmarshal json")
 			return err
 		}
 
@@ -132,7 +132,7 @@ func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError b
 		if err != nil {
 			return err
 		}
-		log.Info().Msg(fmt.Sprintf("Saved Delegations: %d", len(savedDelegations)))
+		log.Info().Msg(fmt.Sprintf("saved delegations: %d", len(savedDelegations)))
 
 		oldTime = newTime
 		time.Sleep(time.Duration(periodInSeconds) * time.Second)

@@ -15,7 +15,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-func StartApplication() {
+func MustStartApplication() {
 	env := os.Getenv("SERVER_ENVIRONMENT")
 
 	log.Info().Msg(fmt.Sprintf("Running Environment: %s", env))
@@ -45,21 +45,25 @@ func StartApplication() {
 	docs.SwaggerInfo.Title = "Tezos Delegation Service"
 	docs.SwaggerInfo.Description = "Service that gathers new delegations made on the Tezos protocol"
 	docs.SwaggerInfo.Version = "0.0.1"
-	docs.SwaggerInfo.BasePath = fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.ApiPath, config.ServerConfigValues.Server.ApiVersion)
+	docs.SwaggerInfo.BasePath = fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.APIPath, config.ServerConfigValues.Server.APIVersion)
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", config.ServerConfigValues.Server.Host, config.ServerConfigValues.Server.Port)
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// Connect to DB
-	db.DbOrm.MustConnectToDB(config.ServerConfigValues)
-	db.DbOrm.GetDB().AutoMigrate(&models.Delegation{})
+	db.ORM.MustConnectToDB(config.ServerConfigValues)
+	err := db.ORM.GetDB().AutoMigrate(&models.Delegation{})
+	if err != nil {
+		log.Err(err).Msg("Incorrect DB migration")
+		os.Exit(1)
+	}
 
-	inititalizeDb()
+	inititalizeDB()
 
 	stopOnError := false
 	errorCh := make(chan error)
 	quitOnErrorSignalCh := make(chan struct{})
 
-	go services.Delegation.Poll(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
+	go services.Delegation.Poll(config.ServerConfigValues.APIDelegations.PollPeriodInSeconds, config.ServerConfigValues.APIDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
 
 	// Create Router
 	router := NewRouter()
@@ -67,9 +71,13 @@ func StartApplication() {
 	MapUrls()
 
 	// Start Server
-	router.Run(":" + config.ServerConfigValues.Server.Port)
+	err = router.Run(":" + config.ServerConfigValues.Server.Port)
+	if err != nil {
+		log.Err(err).Msg("Error starting router")
+		os.Exit(1)
+	}
 }
 
-func inititalizeDb() {
+func inititalizeDB() {
 
 }

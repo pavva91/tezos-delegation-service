@@ -19,8 +19,8 @@ func TestRoutesMappings(t *testing.T) {
 	expectedNumberOfRoutes := 3
 	assert.EqualValues(t, expectedNumberOfRoutes, len(routes))
 
-	expectedHttpMethod := http.MethodGet
-	expectedUrl := apiVersion + "/xtz/delegations"
-	assert.EqualValues(t, expectedHttpMethod, routes[0].Method)
-	assert.EqualValues(t, expectedUrl, routes[0].Path)
+	expectedHTTPMethod := http.MethodGet
+	expectedURL := apiVersion + "/xtz/delegations"
+	assert.EqualValues(t, expectedHTTPMethod, routes[0].Method)
+	assert.EqualValues(t, expectedURL, routes[0].Path)
 }

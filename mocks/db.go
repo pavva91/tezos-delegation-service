@@ -8,15 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type DbOrgMock struct {
+type DBOrg struct {
 	Mock   sqlmock.Sqlmock
-	SqlDB  *sql.DB
+	DB  *sql.DB
 	GormDB *gorm.DB
 }
 
-func (dbOrmMock DbOrgMock) ConnectToDB(cfg config.ServerConfig) {
+func (dbm DBOrg) ConnectToDB(cfg config.ServerConfig) {
 }
 
-func (dbOrmMock DbOrgMock) GetDB() *gorm.DB {
-	return dbOrmMock.GormDB
+func (dbm DBOrg) GetDB() *gorm.DB {
+	return dbm.GormDB
 }

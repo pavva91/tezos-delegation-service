@@ -43,5 +43,5 @@ func main() {
 	}
 	log.Info().Msg("Debug mode: " + strconv.FormatBool(isDebug))
 	// log.Info().Msg("GOMAXPROCS: " + strconv.Itoa(runtime.GOMAXPROCS(0)))
-	server.StartApplication()
+	server.MustStartApplication()
 }

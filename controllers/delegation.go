@@ -50,6 +50,7 @@ func (controller delegation) List(c *gin.Context) {
 
 		return
 	}
+
 	delegationResponses := new(dto.DelegationResponse).ToDtos(delegations)
 	response := dto.DataDelegationSliceResponse{
 		Data: delegationResponses,
