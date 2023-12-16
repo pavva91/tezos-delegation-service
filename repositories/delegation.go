@@ -8,18 +8,18 @@ import (
 )
 
 var (
-	DelegationRepository DelegationRepositoryInterface = delegationRepositoryImpl{}
+	DelegationRepository Delegation = delegation{}
 )
 
-type DelegationRepositoryInterface interface {
+type Delegation interface {
 	List() ([]models.Delegation, error)
 	ListByYear(year time.Time) ([]models.Delegation, error)
-	Create(delegation *models.Delegation) error
+	Create(d *models.Delegation) error
 }
 
-type delegationRepositoryImpl struct{}
+type delegation struct{}
 
-func (repository delegationRepositoryImpl) List() ([]models.Delegation, error) {
+func (r delegation) List() ([]models.Delegation, error) {
 	delegations := []models.Delegation{}
 	err := db.DbOrm.GetDB().Order("timestamp DESC").Find(&delegations).Error
 	if err != nil {
@@ -28,7 +28,7 @@ func (repository delegationRepositoryImpl) List() ([]models.Delegation, error) {
 	return delegations, nil
 }
 
-func (repository delegationRepositoryImpl) ListByYear(year time.Time) ([]models.Delegation, error) {
+func (r delegation) ListByYear(year time.Time) ([]models.Delegation, error) {
 	delegations := []models.Delegation{}
 	err := db.DbOrm.GetDB().Where("EXTRACT(YEAR FROM timestamp) = ?", year.Year()).Order("timestamp DESC").Find(&delegations).Error
 	if err != nil {
@@ -37,6 +37,6 @@ func (repository delegationRepositoryImpl) ListByYear(year time.Time) ([]models.
 	return delegations, nil
 }
 
-func (repository delegationRepositoryImpl) Create(delegation *models.Delegation) error {
-	return db.DbOrm.GetDB().Create(&delegation).Error
+func (r delegation) Create(d *models.Delegation) error {
+	return db.DbOrm.GetDB().Create(&d).Error
 }
