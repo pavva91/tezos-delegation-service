@@ -28,7 +28,7 @@ func Test_ListDelegations_QueryParameterYearString_400(t *testing.T) {
 	expectedHttpStatus := http.StatusBadRequest
 	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\": cannot parse \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\"\"}"
 
-	DelegationController.ListDelegations(mockContext)
+	Delegation.List(mockContext)
 
 	actualHttpStatus := mockContext.Writer.Status()
 	actualHttpBody := response.Body.String()
@@ -50,7 +50,7 @@ func Test_ListDelegations_QueryParameterWrongDate_400(t *testing.T) {
 	wrongYearInError := strings.Replace(wrongYearQueryParameterValue, "+", " ", 1)
 	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearInError + "\\\": extra text: \\\"" + wrongYearInError[4:] + "\\\"\"}"
 
-	DelegationController.ListDelegations(mockContext)
+	Delegation.List(mockContext)
 
 	actualHttpStatus := mockContext.Writer.Status()
 	actualHttpBody := response.Body.String()
@@ -71,7 +71,7 @@ func Test_ListDelegations_QueryParameterYearTrailingChars_400(t *testing.T) {
 	expectedHttpStatus := http.StatusBadRequest
 	expectedHttpBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\": extra text: \\\"" + wrongYearQueryParameterValue[4:] + "\\\"\"}"
 
-	DelegationController.ListDelegations(mockContext)
+	Delegation.List(mockContext)
 
 	actualHttpStatus := mockContext.Writer.Status()
 	actualHttpBody := response.Body.String()
@@ -97,9 +97,9 @@ func Test_ListDelegations_ServiceInternalError_500(t *testing.T) {
 	delegationServiceStub.ListDelegationsFn = func(time.Time) ([]models.Delegation, error) {
 		return nil, errors.New(errorMessage)
 	}
-	services.DelegationService = delegationServiceStub
+	services.Delegation = delegationServiceStub
 
-	DelegationController.ListDelegations(mockContext)
+	Delegation.List(mockContext)
 
 	actualHttpStatus := mockContext.Writer.Status()
 	actualHttpBody := response.Body.String()
@@ -136,9 +136,9 @@ func Test_ListDelegations_OK_200(t *testing.T) {
 	delegationServiceStub.ListDelegationsFn = func(time.Time) ([]models.Delegation, error) {
 		return delegations, nil
 	}
-	services.DelegationService = delegationServiceStub
+	services.Delegation = delegationServiceStub
 
-	DelegationController.ListDelegations(mockContext)
+	Delegation.List(mockContext)
 
 	actualHttpStatus := mockContext.Writer.Status()
 	actualHttpBody := response.Body.String()

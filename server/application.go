@@ -50,7 +50,7 @@ func StartApplication() {
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// Connect to DB
-	db.DbOrm.ConnectToDB(config.ServerConfigValues)
+	db.DbOrm.MustConnectToDB(config.ServerConfigValues)
 	db.DbOrm.GetDB().AutoMigrate(&models.Delegation{})
 
 	inititalizeDb()
@@ -59,7 +59,7 @@ func StartApplication() {
 	errorCh := make(chan error)
 	quitOnErrorSignalCh := make(chan struct{})
 
-	go services.DelegationService.PollDelegations(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
+	go services.Delegation.Poll(config.ServerConfigValues.ApiDelegations.PollPeriodInSeconds, config.ServerConfigValues.ApiDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
 
 	// Create Router
 	router := NewRouter()

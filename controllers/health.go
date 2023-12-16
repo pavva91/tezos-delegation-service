@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-type healthController struct{}
+type health struct{}
 
 var (
-	HealthController = healthController{}
+	Health = health{}
 )
 
 // HealthController godoc
@@ -20,6 +20,6 @@ var (
 //	@Produce		json
 //	@Success		200	{string}	message
 //	@Router			/health [get]
-func (controller healthController) Status(c *gin.Context) {
+func (controller health) Status(c *gin.Context) {
 	c.String(http.StatusOK, "Working!")
 }

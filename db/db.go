@@ -16,13 +16,13 @@ var (
 )
 
 type OrmInterface interface {
-	ConnectToDB(cfg config.ServerConfig)
+	MustConnectToDB(cfg config.ServerConfig)
 	GetDB() *gorm.DB
 }
 
 type dbOrmImpl struct{}
 
-func (dbOrm dbOrmImpl) ConnectToDB(cfg config.ServerConfig) {
+func (dbOrm dbOrmImpl) MustConnectToDB(cfg config.ServerConfig) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 		cfg.Database.Host,

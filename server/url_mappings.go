@@ -9,11 +9,11 @@ import (
 func mapUrls(apiVersion string) {
 	api := router.Group(apiVersion)
 	{
-		api.GET("/xtz/delegations", controllers.DelegationController.ListDelegations)
+		api.GET("/xtz/delegations", controllers.Delegation.List)
 
 		healthGroup := api.Group("health")
 		{
-			healthGroup.GET("", controllers.HealthController.Status)
+			healthGroup.GET("", controllers.Health.Status)
 		}
 	}
 

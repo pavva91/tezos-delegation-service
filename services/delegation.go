@@ -16,18 +16,18 @@ import (
 )
 
 var (
-	DelegationService DelegationServiceInterface = delegationServiceImpl{}
+	Delegation DelegationServicer = delegation{}
 )
 
-type DelegationServiceInterface interface {
-	ListDelegations(year time.Time) ([]models.Delegation, error)
+type DelegationServicer interface {
+	List(year time.Time) ([]models.Delegation, error)
 	// PollDelegations Fuction that runs asynchronously for polling delegations
-	PollDelegations(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error
+	Poll(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error
 }
 
-type delegationServiceImpl struct{}
+type delegation struct{}
 
-func (service delegationServiceImpl) ListDelegations(year time.Time) ([]models.Delegation, error) {
+func (s delegation) List(year time.Time) ([]models.Delegation, error) {
 	if year.IsZero() {
 		return repositories.DelegationRepository.List()
 	}
@@ -58,7 +58,7 @@ func SaveBulkDelegations(delegations []dto.DelegationResponseFromApi) ([]models.
 	return savedDelegations, nil
 }
 
-func (service delegationServiceImpl) PollDelegations(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error {
+func (s delegation) Poll(periodInSeconds uint, apiEndpoint string, quitOnError bool, errorOutCh chan<- error, quitOnErrorTrueSignalInCh <-chan struct{}) error {
 
 	client := http.Client{
 		Timeout: 5 * time.Second,

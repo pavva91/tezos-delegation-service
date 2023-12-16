@@ -34,7 +34,7 @@ func (suite *HealthTestSuite) Test_Status_Return200() {
 	expectedHttpStatus := http.StatusOK
 	expectedHttpBody := "Working!"
 
-	HealthController.Status(suite.GinContextPointer)
+	Health.Status(suite.GinContextPointer)
 
 	actualHttpStatus := suite.GinContextPointer.Writer.Status()
 	actualHttpBody := suite.Response.Body.String()

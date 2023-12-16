@@ -27,7 +27,7 @@ func Test_ListDelegations_YearNonZero_Error(t *testing.T) {
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	delegations, err := DelegationService.ListDelegations(nonZeroValueDate)
+	delegations, err := Delegation.List(nonZeroValueDate)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, delegations)
@@ -44,7 +44,7 @@ func Test_ListDelegations_YearIsZero_Error(t *testing.T) {
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	delegations, err := DelegationService.ListDelegations(zeroValueDate)
+	delegations, err := Delegation.List(zeroValueDate)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, delegations)
@@ -61,7 +61,7 @@ func Test_ListDelegations_YearNonZeroEmptyList_Empty(t *testing.T) {
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	delegations, err := DelegationService.ListDelegations(nonZeroValueDate)
+	delegations, err := Delegation.List(nonZeroValueDate)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, delegations)
@@ -78,7 +78,7 @@ func Test_ListDelegations_YearIsZeroEmptyList_Empty(t *testing.T) {
 	}
 	repositories.DelegationRepository = delegationRepositoryStub
 
-	delegations, err := DelegationService.ListDelegations(zeroValueDate)
+	delegations, err := Delegation.List(zeroValueDate)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, delegations)
@@ -94,7 +94,7 @@ func Test_PollDelegations_WrongApiEndpointScheme_Error(t *testing.T) {
 	errorCh := make(chan error)
 	interruptCh := make(chan struct{})
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
+	go Delegation.Poll(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	interruptCh <- struct{}{}
@@ -117,7 +117,7 @@ func Test_PollDelegations_WrongApiEndpointDomain_Error(t *testing.T) {
 	interruptCh := make(chan struct{})
 	// TODO: create channel token to send signal
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
+	go Delegation.Poll(pollPeriodInSeconds, wrongApiEndpoint, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	// TODO: create channel token to send signal
@@ -148,7 +148,7 @@ func Test_PollDelegations_Not200FromApiEndpoint_Error(t *testing.T) {
 	}))
 	defer server.Close()
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
+	go Delegation.Poll(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(3 * time.Second)
 	interruptCh <- struct{}{}
@@ -176,7 +176,7 @@ func Test_PollDelegations_ReturnedUnexpectedJSON_Error(t *testing.T) {
 	}))
 	defer server.Close()
 
-	err := DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
+	err := Delegation.Poll(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 	fmt.Println(err.Error())
 
 	assert.NotNil(t, err)
@@ -211,7 +211,7 @@ func Test_PollDelegations_WorksThenApiGoDownAfter2Seconds_Error(t *testing.T) {
 
 	defer server.Close()
 
-	go DelegationService.PollDelegations(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
+	go Delegation.Poll(pollPeriodInSeconds, server.URL, stopOnError, errorCh, interruptCh)
 
 	time.Sleep(5 * time.Second)
 	interruptCh <- struct{}{}

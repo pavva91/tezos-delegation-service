@@ -89,9 +89,7 @@ linters:
 
 ## Tests
 
-### Run All Tests
-
-Run all tests and open results on browser:
+### Run All Tests Run all tests and open results on browser:
 
 - `go test ./... -coverprofile coverage.out && go tool cover -html=coverage.out`
 

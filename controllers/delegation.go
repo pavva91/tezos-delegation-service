@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pavva91/tezos-delegation-service/dto"
@@ -12,12 +11,12 @@ import (
 )
 
 var (
-	DelegationController = delegationController{}
+	Delegation = delegation{}
 )
 
-type delegationController struct{}
+type delegation struct{}
 
-// ListDelegations godoc
+// List godoc
 //
 //	@Summary		List Delegations
 //	@Description	List all the aggregated new delegations
@@ -29,8 +28,8 @@ type delegationController struct{}
 //	@Failure		400		{object}	errorhandling.SimpleErrorMessage
 //	@Failure		500		{object}	errorhandling.SimpleErrorMessage
 //	@Router			/xtz/delegations [get]
-func (controller delegationController) ListDelegations(c *gin.Context) {
-	var queryParameters ListDelegationsQueryParameters
+func (controller delegation) List(c *gin.Context) {
+	var queryParameters dto.ListDelegationsQueryParameters
 	err := c.ShouldBind(&queryParameters)
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to Parse Query Parameters")
@@ -41,7 +40,7 @@ func (controller delegationController) ListDelegations(c *gin.Context) {
 		return
 	}
 	
-	delegations, err := services.DelegationService.ListDelegations(queryParameters.Year)
+	delegations, err := services.Delegation.List(queryParameters.Year)
 
 	if err != nil {
 		log.Err(err).Msg("Error listing delegations")
@@ -57,8 +56,4 @@ func (controller delegationController) ListDelegations(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, &response)
 	c.Abort()
-}
-
-type ListDelegationsQueryParameters struct {
-	Year time.Time `form:"year" time_format:"2006"`
 }
