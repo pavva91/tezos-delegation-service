@@ -10,7 +10,7 @@ import (
 
 type DBOrg struct {
 	Mock   sqlmock.Sqlmock
-	DB  *sql.DB
+	DB     *sql.DB
 	GormDB *gorm.DB
 }
 

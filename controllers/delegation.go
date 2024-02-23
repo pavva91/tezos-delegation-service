@@ -39,7 +39,7 @@ func (controller delegation) List(c *gin.Context) {
 
 		return
 	}
-	
+
 	delegations, err := services.Delegation.List(queryParameters.Year)
 
 	if err != nil {

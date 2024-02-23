@@ -39,8 +39,8 @@ func (suite *HealthTestSuite) Test_Status_Return200() {
 	actualHTTPStatus := suite.GinContextPointer.Writer.Status()
 	actualHTTPBody := suite.Response.Body.String()
 
-	suite.Equal(expectedHTTPStatus,actualHTTPStatus)
-	suite.Equal(expectedHTTPBody,actualHTTPBody)
+	suite.Equal(expectedHTTPStatus, actualHTTPStatus)
+	suite.Equal(expectedHTTPBody, actualHTTPBody)
 	// assert.Equal(suite.T(), expectedHTTPStatus,  actualHTTPStatus)
 	// assert.Equal(suite.T(), expectedHTTPBody,  actualHTTPBody)
 }
