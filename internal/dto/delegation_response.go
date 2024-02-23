@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
 )
 
 type DelegationResponse struct {

@@ -1,4 +1,4 @@
-package controllers_test
+package handlers_test
 
 import (
 	"errors"
@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/tezos-delegation-service/controllers"
-	"github.com/pavva91/tezos-delegation-service/models"
-	"github.com/pavva91/tezos-delegation-service/services"
-	"github.com/pavva91/tezos-delegation-service/stubs"
+	"github.com/pavva91/tezos-delegation-service/internal/handlers"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
+	"github.com/pavva91/tezos-delegation-service/internal/services"
+	"github.com/pavva91/tezos-delegation-service/internal/stubs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +29,7 @@ func Test_ListDelegations_QueryParameterYearString_400(t *testing.T) {
 	expectedHTTPStatus := http.StatusBadRequest
 	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\": cannot parse \\\"" + wrongYearQueryParameterValue + "\\\" as \\\"2006\\\"\"}"
 
-	controllers.Delegation.List(mockContext)
+	handlers.Delegation.List(mockContext)
 
 	actualHTTPStatus := mockContext.Writer.Status()
 	actualHTTPBody := response.Body.String()
@@ -51,7 +51,7 @@ func Test_ListDelegations_QueryParameterWrongDate_400(t *testing.T) {
 	wrongYearInError := strings.Replace(wrongYearQueryParameterValue, "+", " ", 1)
 	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearInError + "\\\": extra text: \\\"" + wrongYearInError[4:] + "\\\"\"}"
 
-	controllers.Delegation.List(mockContext)
+	handlers.Delegation.List(mockContext)
 
 	actualHTTPStatus := mockContext.Writer.Status()
 	actualHTTPBody := response.Body.String()
@@ -72,7 +72,7 @@ func Test_ListDelegations_QueryParameterYearTrailingChars_400(t *testing.T) {
 	expectedHTTPStatus := http.StatusBadRequest
 	expectedHTTPBody := "{\"error\":\"parsing time \\\"" + wrongYearQueryParameterValue + "\\\": extra text: \\\"" + wrongYearQueryParameterValue[4:] + "\\\"\"}"
 
-	controllers.Delegation.List(mockContext)
+	handlers.Delegation.List(mockContext)
 
 	actualHTTPStatus := mockContext.Writer.Status()
 	actualHTTPBody := response.Body.String()
@@ -100,7 +100,7 @@ func Test_ListDelegations_ServiceInternalError_500(t *testing.T) {
 	}
 	services.Delegation = delegationServiceStub
 
-	controllers.Delegation.List(mockContext)
+	handlers.Delegation.List(mockContext)
 
 	actualHTTPStatus := mockContext.Writer.Status()
 	actualHTTPBody := response.Body.String()
@@ -139,7 +139,7 @@ func Test_ListDelegations_OK_200(t *testing.T) {
 	}
 	services.Delegation = delegationServiceStub
 
-	controllers.Delegation.List(mockContext)
+	handlers.Delegation.List(mockContext)
 
 	actualHTTPStatus := mockContext.Writer.Status()
 	actualHTTPBody := response.Body.String()

@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/pavva91/tezos-delegation-service/controllers"
+	"github.com/pavva91/tezos-delegation-service/internal/handlers"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -9,11 +9,11 @@ import (
 func mapUrls(apiVersion string) {
 	api := router.Group(apiVersion)
 	{
-		api.GET("/xtz/delegations", controllers.Delegation.List)
+		api.GET("/xtz/delegations", handlers.Delegation.List)
 
 		healthGroup := api.Group("health")
 		{
-			healthGroup.GET("", controllers.Health.Status)
+			healthGroup.GET("", handlers.Health.Status)
 		}
 	}
 

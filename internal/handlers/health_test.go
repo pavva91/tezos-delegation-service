@@ -1,4 +1,4 @@
-package controllers_test
+package handlers_test
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/tezos-delegation-service/controllers"
+	"github.com/pavva91/tezos-delegation-service/internal/handlers"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -34,7 +34,7 @@ func (suite *HealthTestSuite) Test_Status_Return200() {
 	expectedHTTPStatus := http.StatusOK
 	expectedHTTPBody := "Working!"
 
-	controllers.Health.Status(suite.GinContextPointer)
+	handlers.Health.Status(suite.GinContextPointer)
 
 	actualHTTPStatus := suite.GinContextPointer.Writer.Status()
 	actualHTTPBody := suite.Response.Body.String()

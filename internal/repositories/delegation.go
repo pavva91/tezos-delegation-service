@@ -3,8 +3,8 @@ package repositories
 import (
 	"time"
 
-	"github.com/pavva91/tezos-delegation-service/db"
-	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/internal/db"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
 )
 
 var (

@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/pavva91/tezos-delegation-service/config"
-	"github.com/pavva91/tezos-delegation-service/dto"
-	"github.com/pavva91/tezos-delegation-service/models"
-	"github.com/pavva91/tezos-delegation-service/repositories"
+	"github.com/pavva91/tezos-delegation-service/internal/dto"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
+	"github.com/pavva91/tezos-delegation-service/internal/repositories"
 	"github.com/rs/zerolog/log"
 )
 

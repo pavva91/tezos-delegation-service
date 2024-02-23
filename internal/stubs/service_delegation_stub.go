@@ -3,7 +3,7 @@ package stubs
 import (
 	"time"
 
-	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
 )
 
 type DelegationServiceStub struct {

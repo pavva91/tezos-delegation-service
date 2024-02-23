@@ -1,12 +1,12 @@
-package controllers
+package handlers
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pavva91/tezos-delegation-service/dto"
-	"github.com/pavva91/tezos-delegation-service/errorhandling"
-	"github.com/pavva91/tezos-delegation-service/services"
+	"github.com/pavva91/tezos-delegation-service/internal/dto"
+	"github.com/pavva91/tezos-delegation-service/internal/errorhandling"
+	"github.com/pavva91/tezos-delegation-service/internal/services"
 	"github.com/rs/zerolog/log"
 )
 

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pavva91/tezos-delegation-service/models"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
 )
 
 // NOTE: Created with https://mholt.github.io/json-to-go/

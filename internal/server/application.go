@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/pavva91/tezos-delegation-service/config"
-	"github.com/pavva91/tezos-delegation-service/db"
+	"github.com/pavva91/tezos-delegation-service/internal/db"
 	"github.com/pavva91/tezos-delegation-service/docs"
-	"github.com/pavva91/tezos-delegation-service/models"
-	"github.com/pavva91/tezos-delegation-service/services"
+	"github.com/pavva91/tezos-delegation-service/internal/models"
+	"github.com/pavva91/tezos-delegation-service/internal/services"
 	"github.com/rs/zerolog/log"
 
 	"os"

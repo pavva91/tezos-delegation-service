@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/pavva91/tezos-delegation-service/server"
+	"github.com/pavva91/tezos-delegation-service/internal/server"
 	"github.com/rs/zerolog/log"
 )
 
