@@ -1,4 +1,4 @@
-# Tezos Delegation Service - Mid Backend Exercise
+# Tezos Delegation Service - Backend Exercise
 
 [![Go](https://github.com/pavva91/tezos-delegation-service/actions/workflows/go.yml/badge.svg)](https://github.com/pavva91/tezos-delegation-service/actions/workflows/go.yml)
 
