@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pavva91/tezos-delegation-service/config"
-	"github.com/pavva91/tezos-delegation-service/internal/db"
 	"github.com/pavva91/tezos-delegation-service/docs"
+	"github.com/pavva91/tezos-delegation-service/internal/db"
 	"github.com/pavva91/tezos-delegation-service/internal/models"
 	"github.com/pavva91/tezos-delegation-service/internal/services"
 	"github.com/rs/zerolog/log"
@@ -63,7 +63,12 @@ func MustStartApplication() {
 	errorCh := make(chan error)
 	quitOnErrorSignalCh := make(chan struct{})
 
-	go services.Delegation.Poll(config.ServerConfigValues.APIDelegations.PollPeriodInSeconds, config.ServerConfigValues.APIDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
+	go func() {
+		err := services.Delegation.Poll(config.ServerConfigValues.APIDelegations.PollPeriodInSeconds, config.ServerConfigValues.APIDelegations.Endpoint, stopOnError, errorCh, quitOnErrorSignalCh)
+		if err != nil {
+			log.Err(err).Msg("")
+		}
+	}()
 
 	// Create Router
 	router := NewRouter()
