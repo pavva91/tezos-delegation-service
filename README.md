@@ -4,7 +4,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pavva91/tezos-delegation-service)](https://goreportcard.com/report/github.com/pavva91/tezos-delegation-service)
 
-[![Coverage](https://img.shields.io/badge/Coverage-100.0%25-brightgreen)](https://github.com/pavva91/tezos-delegation-service/.github/workflows/go.yml)
+![Coverage](https://img.shields.io/badge/Coverage-47.2%25-yellow)
 
 Build a service that gathers new delegations made on the Tezos protocol and exposes them through a public API.
 
