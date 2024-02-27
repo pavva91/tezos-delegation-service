@@ -42,6 +42,18 @@ Build a service that gathers new delegations made on the Tezos protocol and expo
 
 ### Quickstart
 
+#### Run
+
+```bash
+docker compose up
+```
+
+#### Development Environment (Hot reload inside container)
+
+```bash
+docker compose -f docker/dev/docker-compose.yml up
+```
+
 #### Config Files
 
 There are 2 config files:

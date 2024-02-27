@@ -1,0 +1,19 @@
+FROM golang:1.22
+
+WORKDIR /project-package
+
+RUN go install github.com/cosmtrek/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+ # FIX:
+ # error obtaining VCS status: exit status 128
+ # Use -buildvcs=false to disable VCS stamping.
+ # failed to build, error: exit status 1
+# INFO: solution is to change line in .air.toml file:
+# [build]
+#   cmd = "go build -o ./tmp/main -buildvcs=false ."
+
+CMD ["air", "-c", ".air.toml"]
+

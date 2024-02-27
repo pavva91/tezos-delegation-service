@@ -1,46 +1,42 @@
+version: "3.8"
 services:
-  dev:
-    container_name: delegations-go-dev
+  web:
+    build: .
     env_file: .env
-    build:
-      context: ../../
-      dockerfile: ./Dockerfile.dev
-    working_dir: /project-package
-    ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
+    container_name: delegations-server
     environment:
       - USE_ENVVAR=true             
       - DB_HOST=172.17.0.1
-      - DB_PORT=${DB_PORT}
+      - DB_PORT=5432
       - DB_NAME=delegations
       - DB_TIMEZONE=Europe/London
       - DB_CONNECTIONS=10
       - DB_USERNAME=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - SERVER_PROTOCOL=http
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=${SERVER_PORT}
+      - SERVER_PORT=${PORT}
       - API_PATH=api
       - API_VERSION=v1
       - DELEGATION_API_ENDPOINT=https://api.tzkt.io/v1
       - DELEGATION_API_POLL_PERIOD=5
       - DELEGATION_API_DELAY_SECONDS=0
-    volumes:
-      - ../../:/project-package/
-    links:
-      - db
+    ports:
+      - "${PORT}:${PORT}"
+    # links:
+    #   - db
     depends_on:
       - db
   db:
-    container_name: delegations-db-dev
     env_file: .env
+    container_name: delegations-db
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=delegations
+
     image: postgres
     ports:
-      # - "${DB_PORT}:${DB_PORT}"
-      - "${DB_PORT}:5432"
+      - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgres/data
-version: "3.8"

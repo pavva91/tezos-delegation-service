@@ -16,6 +16,7 @@ type ServerConfig struct {
 		Password    string `yaml:"pass"  env:"DB_PASSWORD" env-description:"db password"`
 		Port        string `yaml:"port" env:"DB_PORT" env-description:"Database port"`
 		Username    string `yaml:"user"  env:"DB_USERNAME" env-description:"db username"`
+		Timezone    string `yaml:"timezone" env:"DB_TIMEZONE" env-description:"Database timezone"`
 	} `yaml:"database"`
 	Server struct {
 		APIPath            string   `yaml:"apiPath"  env:"API_PATH" env-description:"API base path"`
