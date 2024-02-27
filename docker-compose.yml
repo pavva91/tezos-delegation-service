@@ -23,8 +23,6 @@ services:
       - DELEGATION_API_DELAY_SECONDS=0
     ports:
       - "${PORT}:${PORT}"
-    # links:
-    #   - db
     depends_on:
       - db
   db:
