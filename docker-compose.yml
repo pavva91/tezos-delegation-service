@@ -1,14 +1,14 @@
 version: "3.8"
 services:
-  web:
+  server:
     build: .
     env_file: .env
     container_name: delegations-server
     environment:
-      - DB_HOST=172.17.0.1
+      - DB_HOST=delegations-db
       - DB_PORT=5432
       - DB_NAME=delegations
-      - DB_TIMEZONE=Europe/London
+      - DB_TIMEZONE=Europe/Rome
       - DB_CONNECTIONS=10
       - DB_USERNAME=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -31,9 +31,6 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=delegations
-
     image: postgres
-    ports:
-      - "5432:5432"
     volumes:
       - ./data/db:/var/lib/postgres/data

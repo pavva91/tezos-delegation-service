@@ -32,7 +32,6 @@ func MustStartApplication() {
 	docs.SwaggerInfo.Version = "0.0.1"
 	docs.SwaggerInfo.BasePath = fmt.Sprintf("/%s/%s", config.ServerConfigValues.Server.APIPath, config.ServerConfigValues.Server.APIVersion)
 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", config.ServerConfigValues.Server.Host, config.ServerConfigValues.Server.Port)
-	// docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s/%s/%s", config.ServerConfigValues.Server.Host, config.ServerConfigValues.Server.Port, config.ServerConfigValues.Server.APIPath, config.ServerConfigValues.Server.APIVersion)
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// Connect to DB
