@@ -27,11 +27,6 @@ func NewJSONFormatter() *JSONFormatter {
 	return &JSONFormatter{}
 }
 
-// type ValidationError struct {
-// 	Field  string `json:"field"`
-// 	Reason string `json:"reason"`
-// }
-
 func (JSONFormatter) Descriptive(verr validator.ValidationErrors) []ValidationError {
 	errs := []ValidationError{}
 
