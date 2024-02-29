@@ -1,0 +1,24 @@
+api-delegations:
+  endpoint: "https://api.tzkt.io/v1"
+  pollPeriodInSeconds: 5
+  delayLocalTimestampInSeconds: 0
+
+# Database credentials
+database:
+  connections: 10
+  name: "delegations"
+  host: "localhost"
+  pass: "postgres"
+  # same as "dev-db"
+  port: 5435
+  user: "postgres"
+
+# Server configurations
+server:
+  apiPath: "api"
+  apiVersion: "v1"
+  corsAllowedClients: ["http://localhost:5173"]
+  environment: "dev"
+  host: "localhost"
+  port: 3001
+  protocol: "http"
